@@ -3,12 +3,12 @@ import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAk-8zmrfXiXMS2tFaqoY7RvSB82u-afxs",
-  authDomain: "my-shop-31c96.firebaseapp.com",
-  projectId: "my-shop-31c96",
-  storageBucket: "my-shop-31c96.firebasestorage.app",
-  messagingSenderId: "271437476922",
-  appId: "1:271437476922:web:5ae996f20db4beda47b103",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -17,7 +17,13 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 
-// 🔥 Offline Persistence Enable
-enableIndexedDbPersistence(db).catch((err) => {
-  console.log("Offline error:", err);
-});
+// Safe check for browser environment before enabling persistence
+if (typeof window !== "undefined") {
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+        console.log("Persistence failed: Multiple tabs open");
+    } else if (err.code === 'unimplemented') {
+        console.log("Persistence is not available in this browser");
+    }
+  });
+}

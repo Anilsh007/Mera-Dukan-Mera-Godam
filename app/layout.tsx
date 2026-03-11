@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mera Dukan Mera Godam",
   description: "Stock & inventory management app",
+  icons:{
+    icon:"/fevicon.ico",
+  }
 };
 
 export default function RootLayout({
