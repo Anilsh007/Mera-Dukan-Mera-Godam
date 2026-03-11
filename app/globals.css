@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+
+html {
+
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+
+  --bg-sidebar: #ffffff;
+  --bg-header: #ffffff;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --border-color: #e2e8f0;
+  --border-card: #e2e8f0;
+
+  --shadow-card: 0 0px 10px rgba(166, 166, 166, 0.516);
+  --shadow-header: 0 1px 2px rgba(0,0,0,0.06);
+
+  --accent-blue: #ffffff;
+  --accent-green: #22c55e;
+
+  --sidebar-active: rgb(37, 100, 235);
+  --sidebar-hover: rgba(0,0,0,0.05);
+
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+
+html[data-theme="dark"] {
+
+  --bg-primary: #0b1120;
+  --bg-secondary: #111827;
+  --bg-card: #1f2937;
+
+  --bg-sidebar: #020617;
+  --bg-header: #111827;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5f5;
+  --text-muted: #64748b;
+
+  --border-color: #1e293b;
+  --border-card: #1e293b;
+
+  --shadow-card: 0 2px 6px rgba(0,0,0,0.5);
+  --shadow-header: 0 1px 3px rgba(0,0,0,0.4);
+
+  --accent-white: #3b82f6;
+  --accent-green: #22c55e;
+
+  --sidebar-active: rgba(59,130,246,0.2);
+  --sidebar-hover: rgba(255,255,255,0.05);
+
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.15s ease;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+/* ================================================================================= */
+/* sidebar css */
+.activeSidebar{
+left: 0%;
+  transition: 0.5s;
+}
+
+.deActiveSidebar{
+  left: -100%;
+  transition: 0.5s;
 }
