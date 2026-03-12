@@ -8,16 +8,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    turbo: {
-      rules: {
-        '*.css': {
-          loaders: ['postcss-loader'],
-          as: 'style',
-        },
-      },
-    },
-  },
 };
 
 export default nextConfig;
