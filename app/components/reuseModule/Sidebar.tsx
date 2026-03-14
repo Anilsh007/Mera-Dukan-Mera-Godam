@@ -6,8 +6,8 @@ import { LayoutDashboard, Package, PlusCircle, BarChart2, Settings, Menu, X } fr
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/stock", label: "Stock", icon: Package },
   { href: "/dashboard/add-product", label: "Add Product", icon: PlusCircle },
+  { href: "/dashboard/all-stock", label: "All Stock", icon: Package },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (v: boolean) => void }) {

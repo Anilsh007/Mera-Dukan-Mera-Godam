@@ -1,15 +1,18 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider, Button } from "@/app/components/client/useClient";
+"use client";
+
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth, provider } from "@/app/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import { FcGoogle } from "react-icons/fc";
-import logo from "../../../assets/logo.svg";
 import { useRef } from "react";
+import logo from "../../../assets/logo.svg";
+import { syncToDrive } from "@/app/lib/drive.service";
 
-// 3D Background Sub-Component
 const AnimatedBackground = () => {
     const meshRef = useRef<any>(null);
+
     useFrame((state) => {
         if (meshRef.current) {
             const time = state.clock.getElapsedTime();
@@ -21,19 +24,35 @@ const AnimatedBackground = () => {
     return (
         <Float speed={2} rotationIntensity={2} floatIntensity={2}>
             <Sphere args={[1, 64, 64]} scale={2.5}>
-                <MeshDistortMaterial ref={meshRef} distort={0.5} speed={2} roughness={0.1} metalness={0.2} />
+                <MeshDistortMaterial
+                    ref={meshRef}
+                    distort={0.5}
+                    speed={2}
+                    roughness={0.1}
+                    metalness={0.2}
+                />
             </Sphere>
         </Float>
     );
 };
 
-// Main Login Component
 export default function Login() {
     const router = useRouter();
 
     const handleLogin = async () => {
         try {
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential?.accessToken;
+
+            setInterval(() => {
+                const token = localStorage.getItem("google_drive_token");
+                if (token) {
+                    syncToDrive(token);
+                }
+            }, 60000);
+
             router.push("/dashboard");
         } catch (error) {
             console.error("Login failed:", error);
@@ -46,28 +65,30 @@ export default function Login() {
                 <Canvas camera={{ position: [0, 0, 5] }}>
                     <ambientLight intensity={0.5} />
                     <pointLight position={[10, 10, 10]} intensity={1} />
-                    <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
                     <AnimatedBackground />
                 </Canvas>
             </div>
 
-            <div className="relative z-10 p-10 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[50px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center gap-8 w-[400px]">
-                <div className="relative w-24 h-24 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping" />
-                    <div className="relative w-20 h-20 bg-gradient-to-br to-emerald-600 rounded-3xl flex items-center justify-center shadow-2xl border border-white/50">
-                        <img src={logo.src} alt="Logo" className="absolute w-12 h-12" />
-                    </div>
-                </div>
+            <div className="relative z-10 p-10 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[40px] shadow-xl flex flex-col items-center gap-8 w-[380px]">
+                <img src={logo.src} alt="Logo" className="w-16 h-16" />
 
                 <div className="text-center">
-                    <h1 className="text-white text-4xl font-black tracking-tight mb-2">Login</h1>
-                    <p className="text-emerald-400/80 font-medium uppercase tracking-[0.2em] text-xs">Secure Access</p>
+                    <h1 className="text-white text-3xl font-bold">Login</h1>
+                    <p className="text-emerald-400 text-xs tracking-widest uppercase">
+                        Secure Access
+                    </p>
                 </div>
 
-                <Button onClick={handleLogin} title="Continue with Google" className="p-5 border border-white/70 rounded-[10px] text-white" icon={<FcGoogle className="text-2xl" />} />
+                <button
+                    onClick={handleLogin}
+                    className="flex items-center gap-3 border border-white/60 px-6 py-3 rounded-lg text-white hover:bg-white/10 transition"
+                >
+                    <FcGoogle size={22} />
+                    Continue with Google
+                </button>
 
-                <p className="text-white/30 text-[10px] text-center uppercase tracking-widest">
-                    Powered by Firebase Auth
+                <p className="text-white/40 text-[10px] uppercase tracking-widest">
+                    Powered by Firebase
                 </p>
             </div>
         </div>

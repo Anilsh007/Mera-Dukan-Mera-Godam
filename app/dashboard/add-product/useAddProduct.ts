@@ -1,22 +1,56 @@
-import { useState } from "react";
-import { addProduct } from "./product.service";
+"use client"
+
+import { useState } from "react"
+import { addProduct } from "@/app/dashboard/add-product/product.service"
+import { auth } from "@/app/components/client/useClient"
+import { syncToDrive } from "@/app/lib/drive.service"
+import { toast } from "sonner"
 
 export default function useAddProduct() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const createProduct = async (product: any, onSuccess?: () => void) => {
-    setLoading(true);
+  const createProduct = async (
+    data: {
+      name: string
+      price: string
+      quantity: string
+      category?: string
+    },
+    resetForm: () => void
+  ) => {
+
     try {
-      await addProduct(product);
-      alert("✅ Product Added Successfully!");
-      if (onSuccess) onSuccess();
-    } catch (err) {
-      console.error(err);
-      alert("❌ Error adding product");
-    } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(true)
+      const userId = auth.currentUser?.email
 
-  return { createProduct, loading };
+      if (!userId) {
+        toast.success("User not logged in");
+        return
+      }
+
+      // 2. Pehle Local Database (Dexie) mein save karein
+      await addProduct({
+        name: data.name,
+        price: Number(data.price),
+        quantity: Number(data.quantity),
+        category: data.category
+      }, userId)
+
+      // 3. Drive Sync Logic
+      const token = localStorage.getItem("google_drive_token")
+      if (token) {
+        await syncToDrive(token) // Local save ke baad Drive par sync
+        console.log("Drive synced!")
+      }
+      toast.success("Data submitted successfully");
+      resetForm()
+
+    } catch (err) {
+      toast.error(`Error adding product or syncing: ${err instanceof Error ? err.message : String(err)}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { createProduct, loading }
 }

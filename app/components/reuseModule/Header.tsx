@@ -65,7 +65,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                 <p className="text-xs text-">Signed in as</p>
                 <p className="text-sm font-semibold truncate">
                   <span className="hidden sm:block text-sm font-medium text-">{user?.displayName?.split(" ")[0]}</span>
-                  {/* {user?.email} */}
+                  {user?.email}
                 </p>
 
               </div>

@@ -1,6 +1,7 @@
 "use client";
 import { ProtectedRoute, Sidebar, Header } from "@/app/components/client/useClient";
 import { useState } from "react";
+import { Toaster } from "sonner";
 
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -12,6 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
         <div style={{ padding: "24px", flex: 1 }}>
           {children}
+          <Toaster richColors position="top-right" />
         </div>
       </div>
     </ProtectedRoute>

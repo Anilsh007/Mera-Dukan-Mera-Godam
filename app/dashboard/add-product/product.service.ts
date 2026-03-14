@@ -1,15 +1,19 @@
-import { db } from "@/app/components/client/useClient";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/app/components/client/useClient"
 
-export const addProduct = async (product: any) => {
-    // Conversion logic yahan rakhna best hai taaki components clean rahein
-    const productData = {
-        ...product,
-        price: Number(product.price) || 0,
-        quantity: Number(product.quantity) || 0,
-        createdAt: serverTimestamp()
-    };
+export async function addProduct(
+  data: {
+    name: string
+    price: number
+    quantity: number
+    category?: string
+  },
+  userId: string
+) {
 
-    const docRef = await addDoc(collection(db, "products"), productData);
-    return docRef.id;
-};
+  await db.products.add({
+    ...data,
+    userId,
+    createdAt: new Date().toISOString()
+  })
+
+}

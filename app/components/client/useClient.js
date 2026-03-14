@@ -7,7 +7,8 @@ export { default as Header } from "../reuseModule/Header";
 export { default as Login } from "../reuseModule/login";
 export { default as ProtectedRoute } from "../reuseModule/ProtectedRoute";
 export { default as Sidebar } from "../reuseModule/Sidebar";
-export { auth, provider, db } from "../../lib/firebase";
+export { auth, provider } from "../../lib/firebase";
+export { db } from "../../lib/db";
 export { default as Button } from "../utility/Button";
 
 // Theme exports
