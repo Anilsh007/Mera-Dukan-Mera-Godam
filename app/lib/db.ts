@@ -6,6 +6,9 @@ export interface Product {
   price: number
   quantity: number
   category?: string
+  supplier?: string
+  note?: string
+  expiry?: string
   userId: string
   createdAt: string
 }

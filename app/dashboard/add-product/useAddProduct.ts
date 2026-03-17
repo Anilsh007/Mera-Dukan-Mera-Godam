@@ -15,6 +15,9 @@ export default function useAddProduct() {
       price: string
       quantity: string
       category?: string
+      supplier?: string
+      expiry?: string
+      note?: string
     },
     resetForm: () => void
   ) => {
@@ -33,7 +36,8 @@ export default function useAddProduct() {
         name: data.name,
         price: Number(data.price),
         quantity: Number(data.quantity),
-        category: data.category
+        category: data.category,
+        supplier: data.supplier
       }, userId)
 
       // 3. Drive Sync Logic

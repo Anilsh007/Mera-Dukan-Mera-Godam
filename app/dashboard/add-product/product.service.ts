@@ -6,6 +6,9 @@ export async function addProduct(
     price: number
     quantity: number
     category?: string
+    supplier?: string
+    expiry?: string
+    note?: string
   },
   userId: string
 ) {

@@ -22,7 +22,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       )}
 
       {/* Sidebar Container */}
-      <div className={`border border-gray-700 fixed inset-y-0 z-50 w-64 flex flex-col gap-2 p-2 rounded-xl bg-[var(--bg-sidebar)] shadow-[var(--shadow-card)] lg:static lg:left-0 lg:m-3 ${isOpen ? "activeSidebar m-3" : "deActiveSidebar"} `} >
+      <div className={`border border-gray-700 fixed inset-y-0 z-50 w-50 flex flex-col gap-2 p-2 rounded-xl bg-[var(--bg-sidebar)] shadow-[var(--shadow-card)] lg:static lg:left-0 lg:m-3 ${isOpen ? "activeSidebar m-3" : "deActiveSidebar"} `} >
 
         <div className="p-4 mb-2 flex justify-between items-center">
           <h1 className="font-bold text-lg">Mera Dukan</h1>
