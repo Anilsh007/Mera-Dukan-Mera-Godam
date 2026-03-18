@@ -68,21 +68,21 @@ export default function TableComponent({ data }: { data: TableItem[] }) {
                                     if (col === "category")
                                         return (
                                             <td key={col} className="px-6 py-4">
-                                                <span className="inline-flex rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs uppercase">{item.category || "General"}</span>
+                                                <span className="inline-flex rounded-md px-2 py-1 text-xs uppercase">{item.category || "General"}</span>
                                             </td>
                                         )
 
                                     if (col === "supplier")
                                         return (
                                             <td key={col} className="px-6 py-4">
-                                                <span className="inline-flex rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs uppercase">{item.supplier || "General"}</span>
+                                                <span className="inline-flex rounded-md px-2 py-1 text-xs uppercase">{item.supplier || "General"}</span>
                                             </td>
                                         )
 
                                     if (col === "expiry")
                                         return (
                                             <td key={col} className="px-6 py-4">
-                                                <span className="inline-flex rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs uppercase">{item.expiry || "General"}</span>
+                                                <span className="inline-flex rounded-md px-2 py-1 text-xs uppercase">{item.expiry || "General"}</span>
                                             </td>
                                         )
 
@@ -109,7 +109,7 @@ export default function TableComponent({ data }: { data: TableItem[] }) {
                                     if (col === "note")
                                         return (
                                             <td key={col} className="px-6 py-4">
-                                                <span className="inline-flex rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs uppercase">{item.note || "General"}</span>
+                                                <span className="inline-flex rounded-md px-2 py-1 text-xs uppercase">{item.note || "General"}</span>
                                             </td>
                                         )
 

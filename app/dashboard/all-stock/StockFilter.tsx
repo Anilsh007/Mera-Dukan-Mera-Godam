@@ -71,18 +71,11 @@ export default function StockFilter({
   }
 
   return (
-    <div className="p-4 rounded-2xl border mb-6 bg-[var(--bg-card)]">
+    <div className="p-4 rounded-2xl border border-[var(--border-color)] mb-6 bg-[var(--bg-card)]">
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {filterFields.map(field => (
-          <Input
-            key={field.key}
-            label={field.label}           // ✅ Label for context
-            placeholder={field.placeholder} // ✅ Placeholder for hint
-            type={field.type}
-            value={filters[field.key]}
-            onChange={e => handleChange(field.key, e.target.value)}
-          />
+          <Input key={field.key} label={field.label} placeholder={field.placeholder} type={field.type} value={filters[field.key]} onChange={e => handleChange(field.key, e.target.value)} />
         ))}
       </div>
 

@@ -18,16 +18,17 @@ html {
   --text-muted: #94a3b8;
 
   --border-color: #e2e8f0;
+  --border-input: #abb4bf;
   --border-card: #e2e8f0;
 
   --shadow-card: 0 0px 10px rgba(166, 166, 166, 0.516);
   --shadow-header: 0 1px 2px rgba(0,0,0,0.06);
 
   --accent-blue: #ffffff;
-  --accent-green: #22c55e;
+  --accent-green: #000000;
 
-  --sidebar-active: rgb(37, 100, 235);
-  --sidebar-hover: rgba(0,0,0,0.05);
+  --sidebar-active: #22c55e;
+  --sidebar-hover: #000000af;
 
 }
 
@@ -50,6 +51,7 @@ html[data-theme="dark"] {
   --text-muted: #64748b;
 
   --border-color: #1e293b;
+  --border-input: #3b435d;
   --border-card: #1e293b;
 
   --shadow-card: 0 2px 6px rgba(0,0,0,0.5);

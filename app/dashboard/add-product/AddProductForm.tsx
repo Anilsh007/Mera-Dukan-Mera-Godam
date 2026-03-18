@@ -79,7 +79,7 @@ export default function AddProductForm() {
 
             <div className="space-y-4">
                 {rows.map((row, index) => (
-                    <div key={row.id} className="flex flex-wrap gap-3 items-center border-b pb-4 border-slate-700">
+                    <div key={row.id} className="flex flex-wrap gap-3 items-center border-b pb-4 border-[var(--border-input)]">
 
                         <div className="w-8 h-8 flex items-center justify-center rounded-full border text-xs text-slate-500 font-bold">
                             {index + 1}
@@ -110,7 +110,7 @@ export default function AddProductForm() {
                 <Button type="button" title="Add Another Product" onClick={addRow} variant="dotBorder" icon={<MdAdd />} />
             </div>
 
-            <div className="mt-6 border-t border-slate-700 pt-5">
+            <div className="mt-6 border-t border-[var(--border-input)] pt-5">
                 <p className="flex items-center gap-2 text-sm text-rose-400 pb-4">
                     <CiWarning size={18} /> Review your items before adding them.
                 </p>
