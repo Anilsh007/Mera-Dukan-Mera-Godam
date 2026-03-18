@@ -109,3 +109,13 @@ left: 0%;
   left: -100%;
   transition: 0.5s;
 }
+
+.moveleft{
+  left: 61px;
+  transition: 0.5s;
+}
+
+.moveright{
+  left: 196px;
+  transition: 0.5s;
+}

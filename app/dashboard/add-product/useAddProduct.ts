@@ -9,48 +9,47 @@ import { toast } from "sonner"
 export default function useAddProduct() {
   const [loading, setLoading] = useState(false)
 
-  const createProduct = async (
-    data: {
-      name: string
-      price: string
-      quantity: string
-      category?: string
-      supplier?: string
-      expiry?: string
-      note?: string
-    },
-    resetForm: () => void
-  ) => {
+  const createProduct = async (data: {
+    name: string
+    price: string
+    quantity: string
+    category?: string
+    supplier?: string
+    expiry?: string
+    note?: string
+    sku?: string
+  }) => {
 
     try {
       setLoading(true)
       const userId = auth.currentUser?.email
 
       if (!userId) {
-        toast.success("User not logged in");
+        toast.error("User not logged in")
         return
       }
 
-      // 2. Pehle Local Database (Dexie) mein save karein
       await addProduct({
         name: data.name,
         price: Number(data.price),
         quantity: Number(data.quantity),
         category: data.category,
-        supplier: data.supplier
-      }, userId)
+        supplier: data.supplier,
+        expiry: data.expiry,
+        note: data.note,
+        sku: data.sku,
+        userId: userId
+      })
 
-      // 3. Drive Sync Logic
       const token = localStorage.getItem("google_drive_token")
       if (token) {
-        await syncToDrive(token) // Local save ke baad Drive par sync
-        console.log("Drive synced!")
+        await syncToDrive(token)
       }
-      toast.success("Data submitted successfully");
-      resetForm()
+
+      toast.success("Product added successfully")
 
     } catch (err) {
-      toast.error(`Error adding product or syncing: ${err instanceof Error ? err.message : String(err)}`)
+      toast.error(`Error: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setLoading(false)
     }
