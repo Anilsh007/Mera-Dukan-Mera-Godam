@@ -34,13 +34,13 @@ const createEmptyRow = (): ProductRow => ({
 
 const productInputs = [
     { key: "name", label: (<>Product Name <span className="text-red-500">*</span></>), required: true, type: "text", placeholder: "Enter product name", width: "basis-full lg:basis-[30%]" },
-    { key: "category", label: "Category", type: "text", placeholder: "Enter category", width: "basis-[48%] lg:basis-[15%]" },
-    { key: "expiry", label: (<>Expiry Date <span className="text-red-500">*</span></>), required: true, type: "date", placeholder: "Select expiry", width: "basis-[48%] lg:basis-[15%]" },
-    { key: "sku", label: "SKU", type: "text", placeholder: "Enter SKU", width: "basis-[48%] lg:basis-[20%]" },
-    { key: "price", label: (<>Price per unit <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter price", width: "basis-[48%] lg:basis-[12%]" },
-    { key: "quantity", label: (<>Quantity <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter quantity", width: "basis-[48%] lg:basis-[12%]" },
-    { key: "supplier", label: "Supplier", type: "text", placeholder: "Enter supplier", width: "basis-[48%] lg:basis-[20%]" },
-    { key: "note", label: "Note", type: "text", placeholder: "Add note", width: "basis-full lg:basis-[30%]" }
+    { key: "category", label: "Category", type: "text", placeholder: "Enter category", width: "basis-full md:basis-[48%] lg:basis-[15%]" },
+    { key: "expiry", label: (<>Expiry Date <span className="text-red-500">*</span></>), required: true, type: "date", placeholder: "Select expiry", width: "basis-full md:basis-[48%] lg:basis-[15%]" },
+    { key: "sku", label: "SKU", type: "text", placeholder: "Enter SKU", width: "basis-full md:basis-[48%] lg:basis-[20%]" },
+    { key: "price", label: (<>Price per unit <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter price", width: "basis-full md:basis-[48%] lg:basis-[12%]" },
+    { key: "quantity", label: (<>Quantity <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter quantity", width: "basis-full md:basis-[48%] lg:basis-[12%]" },
+    { key: "supplier", label: "Supplier", type: "text", placeholder: "Enter supplier", width: "basis-full md:basis-[48%] lg:basis-[20%]" },
+    { key: "note", label: "Note", type: "text", placeholder: "Add note", width: "basis-full md:basis-[48%] lg:basis-[30%]" }
 ]
 
 export default function AddProductForm() {
