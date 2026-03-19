@@ -6,6 +6,7 @@ import Button from "@/app/components/utility/Button"
 import { MdOutlineAddchart, MdAdd, MdDeleteOutline } from "react-icons/md"
 import Input from "@/app/components/utility/CommonInput"
 import { CiWarning } from "react-icons/ci"
+import { toast } from "sonner"
 
 type ProductRow = {
     id: string
@@ -32,24 +33,19 @@ const createEmptyRow = (): ProductRow => ({
 })
 
 const productInputs = [
-    { key: "name", label: "Product Name", placeholder: "Enter product name", type: "text", width: "basis-full lg:basis-[30%]" },
-    { key: "category", label: "Category", placeholder: "Enter category", type: "text", width: "basis-[48%] lg:basis-[15%]" },
-    { key: "expiry", label: "Expiry Date", placeholder: "Select expiry", type: "date", width: "basis-[48%] lg:basis-[15%]" },
-    { key: "sku", label: "SKU", placeholder: "Enter SKU", type: "text", width: "basis-[48%] lg:basis-[20%]" },
-    { key: "price", label: "Price", placeholder: "Enter price", type: "number", width: "basis-[48%] lg:basis-[12%]" },
-    { key: "quantity", label: "Quantity", placeholder: "Enter quantity", type: "number", width: "basis-[48%] lg:basis-[12%]" },
-    { key: "supplier", label: "Supplier", placeholder: "Enter supplier", type: "text", width: "basis-[48%] lg:basis-[20%]" },
-    { key: "note", label: "Note", placeholder: "Add note", type: "text", width: "basis-full lg:basis-[30%]" }
+    { key: "name", label: (<>Product Name <span className="text-red-500">*</span></>), required: true, type: "text", placeholder: "Enter product name", width: "basis-full lg:basis-[30%]" },
+    { key: "category", label: "Category", type: "text", placeholder: "Enter category", width: "basis-[48%] lg:basis-[15%]" },
+    { key: "expiry", label: (<>Expiry Date <span className="text-red-500">*</span></>), required: true, type: "date", placeholder: "Select expiry", width: "basis-[48%] lg:basis-[15%]" },
+    { key: "sku", label: "SKU", type: "text", placeholder: "Enter SKU", width: "basis-[48%] lg:basis-[20%]" },
+    { key: "price", label: (<>Price per unit <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter price", width: "basis-[48%] lg:basis-[12%]" },
+    { key: "quantity", label: (<>Quantity <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter quantity", width: "basis-[48%] lg:basis-[12%]" },
+    { key: "supplier", label: "Supplier", type: "text", placeholder: "Enter supplier", width: "basis-[48%] lg:basis-[20%]" },
+    { key: "note", label: "Note", type: "text", placeholder: "Add note", width: "basis-full lg:basis-[30%]" }
 ]
 
 export default function AddProductForm() {
     const { createProduct, loading } = useAddProduct()
     const [rows, setRows] = useState<ProductRow[]>([createEmptyRow()])
-
-    const grandTotal = rows.reduce(
-        (sum, row) => sum + (Number(row.price) || 0) * (Number(row.quantity) || 0),
-        0
-    )
 
     const addRow = () => setRows([...rows, createEmptyRow()])
     const removeRow = (id: string) => rows.length > 1 && setRows(rows.filter(r => r.id !== id))
@@ -60,26 +56,59 @@ export default function AddProductForm() {
         )
     }
 
+    // ✅ Grand Total
+    const grandTotal = rows.reduce(
+        (sum, row) => sum + (Number(row.price) || 0) * (Number(row.quantity) || 0),
+        0
+    )
+
+    // ✅ Dynamic validation
+    const isFormValid = rows.every(row =>
+        productInputs.every(input => {
+            if (!input.required) return true
+            const value = row[input.key as keyof ProductRow]
+            return String(value).trim() !== ""
+        })
+    )
+
+    // ✅ Submit with toast validation
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        const invalidField = rows.find((row, index) =>
+            productInputs.some(input => {
+                if (!input.required) return false
+                const value = row[input.key as keyof ProductRow]
+                if (!String(value).trim()) {
+                    toast.error(`Row ${index + 1}: ${input.label} is required`)
+                    return true
+                }
+                return false
+            })
+        )
+
+        if (invalidField) return
+
         try {
             for (const row of rows) {
                 await createProduct({ ...row, name: row.name.trim() })
             }
+
+            toast.success("Products added successfully ✅")
             setRows([createEmptyRow()])
         } catch (err) {
             console.error(err)
+            toast.error("Something went wrong")
         }
     }
-
-    const isFormValid = rows.every(row => row.name.trim() && row.price && row.quantity)
 
     return (
         <form onSubmit={handleSubmit} className="p-5 bg-[var(--bg-card)] border border-[var(--border-card)] rounded-3xl shadow-xl">
 
             <div className="space-y-4">
+                <p className="flex justify-end text-sm text-rose-400 font-medium">* Required fields must be filled before submitting the form.</p>
                 {rows.map((row, index) => (
-                    <div key={row.id} className="flex flex-wrap gap-3 items-center border-b pb-4 border-[var(--border-input)]">
+                    <div key={row.id} className="flex flex-wrap gap-3 items-center border-b pb-5 border-[var(--border-input)]">
 
                         <div className="w-8 h-8 flex items-center justify-center rounded-full border text-xs text-slate-500 font-bold">
                             {index + 1}
@@ -87,7 +116,8 @@ export default function AddProductForm() {
 
                         {productInputs.map(input => (
                             <div key={input.key} className={`${input.width} min-w-[200px]`}>
-                                <Input type={input.type} label={input.label} placeholder={input.placeholder} value={row[input.key as keyof ProductRow]} onChange={(e) => handleChange(row.id, input.key as keyof ProductRow, e.target.value)} />
+                                <Input type={input.type} label={input.label} placeholder={input.placeholder} value={row[input.key as keyof ProductRow]} onChange={(e) => handleChange(row.id, input.key as keyof ProductRow, e.target.value)}
+                                />
                             </div>
                         ))}
 
@@ -99,15 +129,25 @@ export default function AddProductForm() {
                         </div>
 
                         {rows.length > 1 && (
-                            <Button type="button" onClick={() => removeRow(row.id)} icon={<MdDeleteOutline />} variant="delete" />
+                            <Button
+                                type="button"
+                                onClick={() => removeRow(row.id)}
+                                icon={<MdDeleteOutline />}
+                                variant="delete"
+                            />
                         )}
-
                     </div>
                 ))}
             </div>
 
             <div className="flex justify-end mt-6">
-                <Button type="button" title="Add Another Product" onClick={addRow} variant="dotBorder" icon={<MdAdd />} />
+                <Button
+                    type="button"
+                    title="Add Another Product"
+                    onClick={addRow}
+                    variant="dotBorder"
+                    icon={<MdAdd />}
+                />
             </div>
 
             <div className="mt-6 border-t border-[var(--border-input)] pt-5">
@@ -123,7 +163,12 @@ export default function AddProductForm() {
                         </p>
                     </div>
 
-                    <Button type="submit" title={loading ? "Saving..." : `Complete Entry (${rows.length})`} variant="primary" disabled={loading || !isFormValid} icon={<MdOutlineAddchart />}
+                    <Button
+                        type="submit"
+                        title={loading ? "Saving..." : `Complete Entry (${rows.length})`}
+                        variant="primary"
+                        disabled={loading || !isFormValid}
+                        icon={<MdOutlineAddchart />}
                     />
                 </div>
             </div>

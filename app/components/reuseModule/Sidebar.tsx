@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, PlusCircle, X, ChevronLeft } from "lucide-react";
+import { LayoutDashboard, Package, PlusCircle, X, ChevronLeft, Settings } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/add-product", label: "Add Product", icon: PlusCircle },
   { href: "/dashboard/all-stock", label: "All Stock", icon: Package },
+  { href: "/dashboard/settings", label: "Setting", icon: Settings },
 ];
 
 export default function Sidebar({

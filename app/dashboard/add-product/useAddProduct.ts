@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { addProduct } from "@/app/dashboard/add-product/product.service"
 import { auth } from "@/app/components/client/useClient"
-import { syncToDrive } from "@/app/lib/drive.service"
+import { autoSyncToDrive } from "@/app/lib/autoSync.service"
 import { toast } from "sonner"
 
 export default function useAddProduct() {
@@ -22,6 +22,7 @@ export default function useAddProduct() {
 
     try {
       setLoading(true)
+
       const userId = auth.currentUser?.email
 
       if (!userId) {
@@ -29,6 +30,7 @@ export default function useAddProduct() {
         return
       }
 
+      // ✅ Save locally
       await addProduct({
         name: data.name,
         price: Number(data.price),
@@ -41,12 +43,10 @@ export default function useAddProduct() {
         userId: userId
       })
 
-      const token = localStorage.getItem("google_drive_token")
-      if (token) {
-        await syncToDrive(token)
-      }
+      toast.success("Product saved ✅")
 
-      toast.success("Product added successfully")
+      // ✅ AUTO SYNC (non-blocking)
+      autoSyncToDrive()
 
     } catch (err) {
       toast.error(`Error: ${err instanceof Error ? err.message : String(err)}`)

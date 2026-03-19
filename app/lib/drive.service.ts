@@ -1,22 +1,25 @@
+// lib/drive.service.ts
 import { db } from "@/app/lib/db";
 
 const FILE_NAME = "stock_data_backup.json";
 
 export async function syncToDrive(accessToken: string) {
-
   if (!accessToken) {
-    console.error("❌ No Google Drive access token provided");
+    console.error("❌ No access token");
     return;
   }
 
   try {
-
     const allProducts = await db.products.toArray();
     const fileContent = JSON.stringify(allProducts);
 
-    // 🔎 Check if file already exists
+    // ✅ FIX: encode query
+    const query = encodeURIComponent(
+      `name='${FILE_NAME}' and trashed=false`
+    );
+
     const searchResponse = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=name='${FILE_NAME}' and trashed=false&fields=files(id,name)`,
+      `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -25,17 +28,14 @@ export async function syncToDrive(accessToken: string) {
     );
 
     if (!searchResponse.ok) {
-      const error = await searchResponse.text();
-      console.error("Drive search error:", error);
+      console.error("❌ Drive search failed:", await searchResponse.text());
       return;
     }
 
-    const searchData = await searchResponse.json();
-    const files = searchData.files;
+    const { files } = await searchResponse.json();
 
-    // ✏️ UPDATE EXISTING FILE
-    if (files && files.length > 0) {
-
+    // ✅ UPDATE FILE
+    if (files?.length > 0) {
       const fileId = files[0].id;
 
       const updateResponse = await fetch(
@@ -51,17 +51,15 @@ export async function syncToDrive(accessToken: string) {
       );
 
       if (!updateResponse.ok) {
-        const error = await updateResponse.text();
-        console.error("Drive update error:", error);
+        console.error("❌ Update failed:", await updateResponse.text());
         return;
       }
 
       console.log("✅ Drive backup updated");
     }
 
-    // 📁 CREATE NEW FILE
+    // ✅ CREATE FILE
     else {
-
       const metadata = {
         name: FILE_NAME,
         mimeType: "application/json",
@@ -91,15 +89,13 @@ export async function syncToDrive(accessToken: string) {
       );
 
       if (!createResponse.ok) {
-        const error = await createResponse.text();
-        console.error("Drive create error:", error);
+        console.error("❌ Create failed:", await createResponse.text());
         return;
       }
 
-      console.log("✅ New Drive backup created");
+      console.log("✅ New backup created");
     }
-
   } catch (error) {
-    console.error("❌ Drive sync error:", error);
+    console.error("❌ Sync error:", error);
   }
 }
