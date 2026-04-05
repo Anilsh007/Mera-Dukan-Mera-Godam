@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import useAddProduct from "./useAddProduct"
+import useProducts from "../all-stock/useProducts"
 import Button from "@/app/components/utility/Button"
 import { MdOutlineAddchart, MdAdd, MdDeleteOutline } from "react-icons/md"
 import Input from "@/app/components/utility/CommonInput"
 import { CiWarning } from "react-icons/ci"
 import { toast } from "sonner"
+import Suggestions from "./Suggestions"
 
 type ProductRow = {
     id: string
@@ -33,8 +35,8 @@ const createEmptyRow = (): ProductRow => ({
 })
 
 const productInputs = [
-    { key: "name", label: (<>Product Name <span className="text-red-500">*</span></>), required: true, type: "text", placeholder: "Enter product name", width: "basis-full lg:basis-[30%]" },
-    { key: "category", label: "Category", type: "text", placeholder: "Enter category", width: "basis-full md:basis-[48%] lg:basis-[15%]" },
+    { key: "name", label: (<>Product Name <span className="text-red-500">*</span></>), required: true, type: "text", placeholder: "Enter product name", width: "basis-full lg:basis-[30%]", datalist: "productNames" },
+    { key: "category", label: "Category", type: "text", placeholder: "Enter category", width: "basis-full md:basis-[48%] lg:basis-[15%]", datalist: "categories" },
     { key: "expiry", label: (<>Expiry Date <span className="text-red-500">*</span></>), required: true, type: "date", placeholder: "Select expiry", width: "basis-full md:basis-[48%] lg:basis-[15%]" },
     { key: "sku", label: "SKU", type: "text", placeholder: "Enter SKU", width: "basis-full md:basis-[48%] lg:basis-[20%]" },
     { key: "price", label: (<>Price per unit <span className="text-red-500">*</span></>), required: true, type: "number", placeholder: "Enter price", width: "basis-full md:basis-[48%] lg:basis-[12%]" },
@@ -44,8 +46,10 @@ const productInputs = [
 ]
 
 export default function AddProductForm() {
-    const { createProduct, loading } = useAddProduct()
+    const { createProduct } = useAddProduct()
+    const { products } = useProducts()
     const [rows, setRows] = useState<ProductRow[]>([createEmptyRow()])
+    const [loading, setLoading] = useState(false)
 
     const addRow = () => setRows([...rows, createEmptyRow()])
     const removeRow = (id: string) => rows.length > 1 && setRows(rows.filter(r => r.id !== id))
@@ -56,13 +60,11 @@ export default function AddProductForm() {
         )
     }
 
-    // ✅ Grand Total
     const grandTotal = rows.reduce(
         (sum, row) => sum + (Number(row.price) || 0) * (Number(row.quantity) || 0),
         0
     )
 
-    // ✅ Dynamic validation
     const isFormValid = rows.every(row =>
         productInputs.every(input => {
             if (!input.required) return true
@@ -71,7 +73,6 @@ export default function AddProductForm() {
         })
     )
 
-    // ✅ Submit with toast validation
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -90,8 +91,16 @@ export default function AddProductForm() {
         if (invalidField) return
 
         try {
+            setLoading(true)
             for (const row of rows) {
-                await createProduct({ ...row, name: row.name.trim() })
+                const { id, ...rowData } = row
+                await createProduct({ 
+                    ...rowData, 
+                    name: row.name.trim(),
+                    price: Number(row.price),
+                    quantity: Number(row.quantity),
+                    userId: "" // Add userId - will be set by the backend
+                })
             }
 
             toast.success("Products added successfully ✅")
@@ -99,11 +108,17 @@ export default function AddProductForm() {
         } catch (err) {
             console.error(err)
             toast.error("Something went wrong")
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
         <form onSubmit={handleSubmit} className="p-5 bg-[var(--bg-card)] border border-[var(--border-card)] rounded-3xl shadow-xl">
+
+            {/* Suggestions for Product Name & Category */}
+            <Suggestions products={products} type="product" />
+            <Suggestions products={products} type="category" />
 
             <div className="space-y-4">
                 <p className="flex justify-end text-sm text-rose-400 font-medium">* Required fields must be filled before submitting the form.</p>
@@ -116,7 +131,13 @@ export default function AddProductForm() {
 
                         {productInputs.map(input => (
                             <div key={input.key} className={`${input.width} min-w-[200px]`}>
-                                <Input type={input.type} label={input.label} placeholder={input.placeholder} value={row[input.key as keyof ProductRow]} onChange={(e) => handleChange(row.id, input.key as keyof ProductRow, e.target.value)}
+                                <Input 
+                                    type={input.type} 
+                                    label={input.label} 
+                                    placeholder={input.placeholder} 
+                                    value={row[input.key as keyof ProductRow]} 
+                                    onChange={(e) => handleChange(row.id, input.key as keyof ProductRow, e.target.value)}
+                                    {...(input.datalist ? { list: input.datalist } : {})} // ✅ datalist prop
                                 />
                             </div>
                         ))}

@@ -1,61 +1,35 @@
-"use client"
-
-import { useState } from "react"
-import { addProduct } from "@/app/dashboard/add-product/product.service"
-import { auth } from "@/app/components/client/useClient"
-import { autoSyncToDrive } from "@/app/lib/autoSync.service"
-import { toast } from "sonner"
-import { scheduleSync } from "@/app/lib/syncManager"
+import { db, Product } from "@/app/lib/db";
+import { auth } from "@/app/lib/firebase";
 
 export default function useAddProduct() {
-  const [loading, setLoading] = useState(false)
 
-  const createProduct = async (data: {
-    name: string
-    price: string
-    quantity: string
-    category?: string
-    supplier?: string
-    expiry?: string
-    note?: string
-    sku?: string
-  }) => {
+  const createProduct = async (product: Omit<Product, "id" | "createdAt">) => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) throw new Error("User not logged in");
 
-    try {
-      setLoading(true)
+    // check if product with same name + category already exists
+    const normalizedName = product.name.trim().toLowerCase();
+    const normalizedCategory = (product.category || "").trim().toLowerCase();
 
-      const userId = auth.currentUser?.email
+    const existing = await db.products
+      .where("[userId+name+category]")
+      .equals([userId, normalizedName, normalizedCategory])
+      .first();
 
-      if (!userId) {
-        toast.error("User not logged in")
-        return
-      }
-
-      // ✅ Save locally
-      await addProduct({
-        name: data.name,
-        price: Number(data.price),
-        quantity: Number(data.quantity),
-        category: data.category,
-        supplier: data.supplier,
-        expiry: data.expiry,
-        note: data.note,
-        sku: data.sku,
-        userId: userId
-      })
-
-      toast.success("Product saved ✅")
-
-      // ✅ AUTO SYNC (non-blocking)
-      //autoSyncToDrive()
-      scheduleSync();
-
-    } catch (err) {
-      toast.error(`Error: ${err instanceof Error ? err.message : String(err)}`)
-    } finally {
-      setLoading(false)
+    if (existing) {
+      // update existing product quantity & price (avg or latest price)
+      const updatedQuantity = existing.quantity + Number(product.quantity);
+      const updatedPrice = Number(product.price); // latest price
+      await db.products.update(existing.id!, { quantity: updatedQuantity, price: updatedPrice });
+    } else {
+      // create new product
+      await db.products.add({
+        ...product,
+        userId,
+        createdAt: new Date().toISOString(),
+      });
     }
-  }
+  };
 
-  return { createProduct, loading }
+  return { createProduct };
 }

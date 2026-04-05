@@ -1,62 +1,70 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { autoSyncToDrive } from "@/app/lib/autoSync.service"
-import { getGoogleDriveAccessToken } from "@/app/lib/auth.service"
-import DriveReconnectModal from "@/app/components/reuseModule/DriveReconnectModal"
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { autoSyncToDrive } from "@/app/lib/autoSync.service";
+import { getGoogleDriveAccessToken } from "@/app/lib/auth.service";
+import DriveReconnectModal from "@/app/components/reuseModule/DriveReconnectModal";
+
+// 🔥 NEW IMPORT
+import { syncFromDrive } from "@/app/lib/driveDownload.service";
 
 export default function DriveSyncManager() {
-  const [showReconnectModal, setShowReconnectModal] = useState(false)
+  const [showReconnectModal, setShowReconnectModal] = useState(false);
 
-  /** Initial + online sync */
+  // ✅ Initial + online sync (UPDATED)
   useEffect(() => {
-    autoSyncToDrive()
+    async function init() {
+      const token = await getGoogleDriveAccessToken(false);
 
-    const handleOnline = () => {
-      autoSyncToDrive()
+      if (token) {
+        await syncFromDrive(token); // 🔥 NEW: Drive → Dexie
+        await autoSyncToDrive();    // existing: Dexie → Drive
+      }
     }
 
-    window.addEventListener("online", handleOnline)
-    return () => window.removeEventListener("online", handleOnline)
-  }, [])
+    init();
 
-  /** Background sync every 5 min */
+    const handleOnline = () => autoSyncToDrive();
+    window.addEventListener("online", handleOnline);
+
+    return () => window.removeEventListener("online", handleOnline);
+  }, []);
+
+  // Background sync every 5 min
+  useEffect(() => {
+    const interval = setInterval(() => autoSyncToDrive(), 300000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Check token every 5 sec
   useEffect(() => {
     const interval = setInterval(() => {
-      autoSyncToDrive()
-    }, 300000) // 5 minutes
-
-    return () => clearInterval(interval)
-  }, [])
-
-  /** Check Drive connection every 5 sec */
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const isConnected = localStorage.getItem("drive_connected")
+      const isConnected = localStorage.getItem("drive_connected");
       if (!isConnected || !navigator.onLine) {
-        setShowReconnectModal(true)
+        setShowReconnectModal(true);
       }
-    }, 5000)
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-    return () => clearInterval(interval)
-  }, [])
-
-  /** Reconnect handler */
   const handleReconnect = async () => {
     try {
-      const token = await getGoogleDriveAccessToken(true) // manual popup
-      if (!token) throw new Error("Connection failed")
+      const token = await getGoogleDriveAccessToken(true);
+      if (!token) throw new Error("Connection failed");
 
-      localStorage.setItem("drive_connected", "true")
-      setShowReconnectModal(false)
-      toast.success("Drive reconnected ✅")
+      localStorage.setItem("drive_connected", "true");
+      setShowReconnectModal(false);
+      toast.success("Drive reconnected ✅");
 
-      autoSyncToDrive()
+      // 🔥 ALSO SYNC AFTER RECONNECT
+      await syncFromDrive(token);
+      await autoSyncToDrive();
+
     } catch {
-      toast.error("Connection failed ❌")
+      toast.error("Connection failed ❌");
     }
-  }
+  };
 
   return (
     <DriveReconnectModal
@@ -64,5 +72,5 @@ export default function DriveSyncManager() {
       onClose={() => setShowReconnectModal(false)}
       onConnect={handleReconnect}
     />
-  )
+  );
 }

@@ -4,9 +4,16 @@ import { ProtectedRoute, Sidebar, Header } from "@/app/components/client/useClie
 import { useState } from "react"
 import { Toaster } from "sonner"
 import DriveSyncManager from "@/app/lib/DriveSyncManager"
+import { db } from "@/app/lib/db";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
+
+
+
+  if (typeof window !== "undefined") {
+    (window as any).db = db;
+  }
 
   return (
     <ProtectedRoute>

@@ -69,7 +69,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                 </p>
 
               </div>
-              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition-colors" > <LogOut size={16} /> Logout </button>
+              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer" > <LogOut size={16} /> Logout </button>
             </div>
           )}
         </div>

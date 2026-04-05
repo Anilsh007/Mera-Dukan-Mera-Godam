@@ -14,18 +14,30 @@ export interface Product {
   createdAt: string
 }
 
+export interface ProductLog {
+  id?: number
+  productId: number
+  quantityAdded: number
+  price: number
+  date: string
+  note?: string
+}
+
 class StockDB extends Dexie {
 
   products!: Table<Product>
+  productLogs!: Table<ProductLog>
 
   constructor() {
     super("StockDatabase")
 
-    this.version(2).stores({
-      products: "++id,userId,name,price,quantity,category,sku,createdAt"
+    this.version(3).stores({
+      products: "++id,[userId+name+category],userId,name,price,quantity,category,sku,createdAt",
+      productLogs: "++id,productId,date"
     })
   }
 
 }
+
 
 export const db = new StockDB()

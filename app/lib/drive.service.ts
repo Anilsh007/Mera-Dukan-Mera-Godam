@@ -1,7 +1,7 @@
 // lib/drive.service.ts
 import { db } from "@/app/lib/db";
 
-const FILE_NAME = "stock_data_backup.json";
+const FILE_NAME = "mera_dukan_mera_godam.json";
 
 export async function syncToDrive(accessToken: string) {
   if (!accessToken) {
