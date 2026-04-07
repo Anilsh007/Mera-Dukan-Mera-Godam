@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { liveQuery } from "dexie";
 import { db, Product } from "@/app/lib/db";
 import { auth } from "@/app/lib/firebase";
 
@@ -7,32 +8,27 @@ export default function useProducts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
         setProducts([]);
         setLoading(false);
         return;
       }
 
-      const fetchProducts = async () => {
-        const data = await db.products.toArray(); // ✅ no user filter
-        console.log("🟢 Fetched products:", data);
-        setProducts(data);
-        setLoading(false);
-      };
+      // ✅ liveQuery — Dexie ka sahi tarika hai changes sunne ka
+      // hooks ki zaroorat nahi, aur Promise return karne wala bug bhi nahi
+      const subscription = liveQuery(() => db.products.toArray()).subscribe({
+        next: (data) => {
+          setProducts(data);
+          setLoading(false);
+        },
+        error: (err) => {
+          console.error("Products fetch error:", err);
+          setLoading(false);
+        },
+      });
 
-      await fetchProducts();
-
-      const onChange = () => fetchProducts();
-      db.products.hook("creating", onChange);
-      db.products.hook("updating", onChange);
-      db.products.hook("deleting", onChange);
-
-      return () => {
-        db.products.hook("creating").unsubscribe(onChange);
-        db.products.hook("updating").unsubscribe(onChange);
-        db.products.hook("deleting").unsubscribe(onChange);
-      };
+      return () => subscription.unsubscribe();
     });
 
     return () => unsubscribe();

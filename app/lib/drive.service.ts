@@ -3,6 +3,29 @@ import { db } from "@/app/lib/db";
 
 const FILE_NAME = "mera_dukan_mera_godam.json";
 
+// ─────────────────────────────────────────────
+// Drive par file dhundho — fileId return karta hai ya null
+// ─────────────────────────────────────────────
+async function findDriveFile(accessToken: string): Promise<string | null> {
+  const query = encodeURIComponent(`name='${FILE_NAME}' and trashed=false`);
+
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!res.ok) {
+    console.error("❌ Drive search failed:", await res.text());
+    return null;
+  }
+
+  const { files } = await res.json();
+  return files?.length > 0 ? files[0].id : null;
+}
+
+// ─────────────────────────────────────────────
+// Main sync function — products + logs dono Drive par save karta hai
+// ─────────────────────────────────────────────
 export async function syncToDrive(accessToken: string) {
   if (!accessToken) {
     console.error("❌ No access token");
@@ -10,34 +33,28 @@ export async function syncToDrive(accessToken: string) {
   }
 
   try {
-    const allProducts = await db.products.toArray();
-    const fileContent = JSON.stringify(allProducts);
+    // ✅ Dono tables ek saath fetch karo
+    const [allProducts, allLogs] = await Promise.all([
+      db.products.toArray(),
+      db.productLogs.toArray(),
+    ]);
 
-    // ✅ FIX: encode query
-    const query = encodeURIComponent(
-      `name='${FILE_NAME}' and trashed=false`
-    );
+    // ✅ Ek structured object mein dono data rakho
+    const backup = {
+      version: 2,                          // format version — future changes ke liye
+      exportedAt: new Date().toISOString(),
+      products: allProducts,
+      logs: allLogs,
+    };
 
-    const searchResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const fileContent = JSON.stringify(backup);
 
-    if (!searchResponse.ok) {
-      console.error("❌ Drive search failed:", await searchResponse.text());
-      return;
-    }
+    const fileId = await findDriveFile(accessToken);
 
-    const { files } = await searchResponse.json();
-
-    // ✅ UPDATE FILE
-    if (files?.length > 0) {
-      const fileId = files[0].id;
-
-      const updateResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
+    if (fileId) {
+      // ─── EXISTING FILE UPDATE ───
+      const updateRes = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
         {
           method: "PATCH",
           headers: {
@@ -48,51 +65,49 @@ export async function syncToDrive(accessToken: string) {
         }
       );
 
-      if (!updateResponse.ok) {
-        console.error("❌ Update failed:", await updateResponse.text());
+      if (!updateRes.ok) {
+        console.error("❌ Update failed:", await updateRes.text());
         return;
       }
 
-      console.log("✅ Drive backup updated");
-    }
+      console.log(`✅ Drive backup updated — ${allProducts.length} products, ${allLogs.length} logs`);
 
-    // ✅ CREATE FILE
-    else {
+    } else {
+      // ─── NEW FILE CREATE ───
       const metadata = {
         name: FILE_NAME,
         mimeType: "application/json",
       };
 
       const formData = new FormData();
-
       formData.append(
         "metadata",
         new Blob([JSON.stringify(metadata)], { type: "application/json" })
       );
-
       formData.append(
         "file",
         new Blob([fileContent], { type: "application/json" })
       );
 
-      const createResponse = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+      const createRes = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
           body: formData,
         }
       );
 
-      if (!createResponse.ok) {
-        console.error("❌ Create failed:", await createResponse.text());
+      if (!createRes.ok) {
+        console.error("❌ Create failed:", await createRes.text());
         return;
       }
 
-      console.log("✅ New backup created");
+      console.log(`✅ New Drive backup created — ${allProducts.length} products, ${allLogs.length} logs`);
     }
+
   } catch (error) {
     console.error("❌ Sync error:", error);
+    throw error; // caller ko pata chale
   }
 }

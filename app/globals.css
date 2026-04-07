@@ -3,118 +3,93 @@
 /* ============================================
    LIGHT THEME
    ============================================ */
-
 html {
-
-  --bg-primary: #f1f5f9;
+  --bg-primary:   #f1f5f9;
   --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
+  --bg-card:      #ffffff;
+  --bg-input:     #ffffff;
+  --bg-sidebar:   #ffffff;
+  --bg-header:    #ffffff;
 
-  --bg-sidebar: #ffffff;
-  --bg-header: #ffffff;
-
-  --text-primary: #0f172a;
+  --text-primary:   #0f172a;
   --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-muted:     #94a3b8;
 
   --border-color: #e2e8f0;
   --border-input: #abb4bf;
-  --border-card: #e2e8f0;
+  --border-card:  #e2e8f0;
 
-  --shadow-card: 0 0px 10px rgba(166, 166, 166, 0.516);
-  --shadow-header: 0 1px 2px rgba(0, 0, 0, 0.06);
-
-  --accent-blue: #ffffff;
-  --accent-green: #000000;
+  --shadow-card:   0 0px 10px rgba(166,166,166,0.3);
+  --shadow-header: 0 1px 2px rgba(0,0,0,0.06);
 
   --sidebar-active: #22c55e;
-  --sidebar-hover: #000000af;
-
+  --sidebar-hover:  rgba(0,0,0,0.07);
 }
-
 
 /* ============================================
    DARK THEME
    ============================================ */
-
 html[data-theme="dark"] {
-
-  --bg-primary: #0b1120;
+  --bg-primary:   #0b1120;
   --bg-secondary: #111827;
-  --bg-card: #1f2937;
+  --bg-card:      #1f2937;
+  --bg-input:     #111827;
+  --bg-sidebar:   #020617;
+  --bg-header:    #111827;
 
-  --bg-sidebar: #020617;
-  --bg-header: #111827;
-
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5f5;
-  --text-muted: #64748b;
+  --text-primary:   #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #64748b;
 
   --border-color: #1e293b;
   --border-input: #3b435d;
-  --border-card: #1e293b;
+  --border-card:  #1e293b;
 
-  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.5);
-  --shadow-header: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-card:   0 2px 6px rgba(0,0,0,0.5);
+  --shadow-header: 0 1px 3px rgba(0,0,0,0.4);
 
-  --accent-white: #3b82f6;
-  --accent-green: #22c55e;
-
-  --sidebar-active: rgba(59, 130, 246, 0.2);
-  --sidebar-hover: rgba(255, 255, 255, 0.05);
-
+  --sidebar-active: rgba(59,130,246,0.2);
+  --sidebar-hover:  rgba(255,255,255,0.05);
 }
 
-
 /* ============================================
-   BASE STYLES
+   BASE
    ============================================ */
-
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
 }
 
-
 /* ============================================
    SCROLLBAR
    ============================================ */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
-}
-
-/* ================================================================================= */
-/* sidebar css */
+/* ============================================
+   SIDEBAR TRANSITIONS
+   ============================================ */
 .activeSidebar {
-  left: 0%;
-  transition: 0.5s;
-  width: revert-layer;
-  height: -webkit-fill-available;
+  left: 0;
+  transition: left 0.3s ease;
 }
-
 .deActiveSidebar {
   left: -100%;
-  transition: 0.5s;
-  width: revert-layer;
-  height: -webkit-fill-available;
+  transition: left 0.3s ease;
 }
+.moveleft  { left: 61px;  transition: left 0.3s ease; }
+.moveright { left: 196px; transition: left 0.3s ease; }
 
-.moveleft {
-  left: 61px;
-  transition: 0.5s;
+/* ============================================
+   SKELETON PULSE
+   ============================================ */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
 }
-
-.moveright {
-  left: 196px;
-  transition: 0.5s;
+.skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  background: var(--border-card);
+  border-radius: 6px;
 }
