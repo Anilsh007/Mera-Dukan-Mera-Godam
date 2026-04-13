@@ -76,8 +76,8 @@ export default function StockHistoryTabs({
       tab === "all"
         ? [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         : logs
-            .filter(l => tab === "in" ? l.quantityAdded > 0 : l.quantityAdded < 0)
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .filter(l => tab === "in" ? l.quantityAdded > 0 : l.quantityAdded < 0)
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
     return filtered.map(l => {
       const productName = l.productId
@@ -89,7 +89,7 @@ export default function StockHistoryTabs({
 
   const tabs = [
     { key: "all", label: `All (${logs.length})` },
-    { key: "in",  label: `Stock In (${logs.filter(l => l.quantityAdded > 0).length})` },
+    { key: "in", label: `Stock In (${logs.filter(l => l.quantityAdded > 0).length})` },
     { key: "out", label: `Stock Out (${logs.filter(l => l.quantityAdded < 0).length})` },
   ]
 
@@ -106,19 +106,14 @@ export default function StockHistoryTabs({
 
       <div className="flex gap-2 mb-5 flex-wrap">
         {tabs.map(t => (
-          <Button
-            key={t.key}
-            variant={tab === t.key ? "primary" : "secondary"}
-            onClick={() => setTab(t.key as any)}
-            title={t.label}
-          />
+          <Button key={t.key} variant={tab === t.key ? "primary" : "secondary"} onClick={() => setTab(t.key as any)} title={t.label} />
         ))}
       </div>
 
       {tableData.length === 0 ? (
         <p className="text-center text-sm text-gray-400 py-8">Koi record nahi mila</p>
       ) : (
-        <TableComponent data={tableData} onEdit={() => {}} />
+        <TableComponent data={tableData} onEdit={() => { }} />
       )}
 
     </div>

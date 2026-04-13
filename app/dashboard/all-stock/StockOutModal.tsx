@@ -18,13 +18,13 @@ export default function StockOutModal({
   product: Product
   onClose: () => void
 }) {
-  const [quantity, setQuantity]     = useState("")
-  const [salePrice, setSalePrice]   = useState(String(product.price)) // default: current price
-  const [reason, setReason]         = useState("Sold")
-  const [note, setNote]             = useState("")
+  const [quantity, setQuantity] = useState("")
+  const [salePrice, setSalePrice] = useState(String(product.price)) // default: current price
+  const [reason, setReason] = useState("Sold")
+  const [note, setNote] = useState("")
   const [selectedExpiry, setSelectedExpiry] = useState("")
-  const [expiryOptions, setExpiryOptions]   = useState<string[]>([])
-  const [loading, setLoading]       = useState(false)
+  const [expiryOptions, setExpiryOptions] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const [logsLoading, setLogsLoading] = useState(true)
 
   // product ke sab logs fetch karo — unique expiry dates nikalenge
@@ -48,12 +48,12 @@ export default function StockOutModal({
   }, [product.id])
 
   const handleSubmit = async () => {
-    const qty   = Number(quantity)
+    const qty = Number(quantity)
     const price = Number(salePrice)
 
-    if (!qty || qty <= 0)          return toast.error("Quantity sahi daalo")
-    if (qty > product.quantity)    return toast.error(`Sirf ${product.quantity} available hai`)
-    if (!price || price <= 0)      return toast.error("Sale price daalo")
+    if (!qty || qty <= 0) return toast.error("Quantity sahi daalo")
+    if (qty > product.quantity) return toast.error(`Sirf ${product.quantity} available hai`)
+    if (!price || price <= 0) return toast.error("Sale price daalo")
     if (expiryOptions.length > 0 && !selectedExpiry) return toast.error("Expiry date select karo")
     if (!product.id) return
 
@@ -77,7 +77,7 @@ export default function StockOutModal({
   }
 
   return (
-    <>
+    <div className="p-5 rounded-xl bg-[var(--bg-card)] border-[var(--border-card)] shadow-[var(--shadow-card)]">
       {/* Header */}
       <div className="flex justify-between items-center mb-1">
         <h3 className="text-base font-semibold">Stock Out</h3>
@@ -98,13 +98,9 @@ export default function StockOutModal({
           {logsLoading ? (
             <div className={`${selectClass} text-gray-400 text-sm`}>Loading batches...</div>
           ) : expiryOptions.length === 0 ? (
-            <div className={`${selectClass} text-gray-400 text-sm`}>Koi expiry date nahi mili</div>
+            <div className={`${selectClass} text-gray-400 text-sm`}>No expiry dates available</div>
           ) : (
-            <select
-              value={selectedExpiry}
-              onChange={e => setSelectedExpiry(e.target.value)}
-              className={selectClass}
-            >
+            <select value={selectedExpiry} onChange={e => setSelectedExpiry(e.target.value)} className={selectClass} >
               {expiryOptions.map(exp => (
                 <option key={exp} value={exp}>{exp}</option>
               ))}
@@ -113,24 +109,10 @@ export default function StockOutModal({
         </div>
 
         {/* Quantity */}
-        <Input
-          label={<>Quantity <span className="text-red-400">*</span></>}
-          type="number"
-          placeholder={`Max ${product.quantity}`}
-          min={1}
-          max={product.quantity}
-          value={quantity}
-          onChange={e => setQuantity(e.target.value)}
-        />
+        <Input label={<>Quantity <span className="text-red-400">*</span></>} type="number" placeholder={`Max ${product.quantity}`} min={1} max={product.quantity} value={quantity} onChange={e => setQuantity(e.target.value)} />
 
         {/* Sale Price */}
-        <Input
-          label={<>Sale Price (per unit) <span className="text-red-400">*</span></>}
-          type="number"
-          placeholder="Kitne mein becha?"
-          value={salePrice}
-          onChange={e => setSalePrice(e.target.value)}
-        />
+        <Input label={<>Sale Price (per unit) <span className="text-red-400">*</span></>} type="number" placeholder="How much did you sell it?" value={salePrice} onChange={e => setSalePrice(e.target.value)} />
 
         {/* Live total */}
         {Number(quantity) > 0 && Number(salePrice) > 0 && (
@@ -145,36 +127,20 @@ export default function StockOutModal({
         {/* Reason */}
         <div>
           <label className="block mb-1 text-sm font-medium text-[var(--text-primary)]">Reason</label>
-          <select
-            value={reason}
-            onChange={e => setReason(e.target.value)}
-            className={selectClass}
-          >
+          <select value={reason} onChange={e => setReason(e.target.value)} className={selectClass} >
             {REASONS.map(r => <option key={r}>{r}</option>)}
           </select>
         </div>
 
         {/* Note */}
-        <Input
-          label="Note (optional)"
-          type="text"
-          placeholder="Kuch aur likhna ho to..."
-          value={note}
-          onChange={e => setNote(e.target.value)}
-        />
+        <Input label="Note (optional)" type="text" placeholder="Add a note (optional)" value={note} onChange={e => setNote(e.target.value)} />
 
       </div>
 
       <div className="flex gap-2 mt-6">
         <Button variant="ghost" title="Cancel" onClick={onClose} className="flex-1" />
-        <Button
-          variant="danger"
-          title="Confirm Stock Out"
-          loading={loading}
-          onClick={handleSubmit}
-          className="flex-1"
-        />
+        <Button variant="danger" title="Confirm Stock Out" loading={loading} onClick={handleSubmit} className="flex-1" />
       </div>
-    </>
+    </div>
   )
 }

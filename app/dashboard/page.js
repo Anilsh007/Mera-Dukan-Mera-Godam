@@ -8,16 +8,8 @@ import { useRouter } from "next/navigation"
 
 function StatCard({ label, value, sub, icon, color, loading, onClick }) {
   return (
-    <div
-      onClick={onClick}
-      className={`p-5 rounded-2xl flex items-center gap-4 bg-[var(--bg-card)] border border-[var(--border-card)] shadow-[var(--shadow-card)] transition-all duration-200 ${onClick ? "cursor-pointer hover:-translate-y-1 hover:shadow-lg" : ""}`}
-    >
-      <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl"
-        style={{ background: color + "18" }}
-      >
-        {icon}
-      </div>
+    <div onClick={onClick} className={`p-5 rounded-2xl flex items-center gap-4 bg-[var(--bg-card)] border border-[var(--border-card)] shadow-[var(--shadow-card)] transition-all duration-200 ${onClick ? "cursor-pointer hover:-translate-y-1 hover:shadow-lg" : ""}`} >
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl" style={{ background: color + "18" }}>{icon}</div>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">{label}</p>
         {loading
@@ -53,15 +45,15 @@ export default function DashboardHome() {
           db.productLogs.toArray(),
         ])
 
-        const totalProducts   = products.length
-        const lowStock        = products.filter(p => p.quantity > 0 && p.quantity <= 10).length
-        const outOfStock      = products.filter(p => p.quantity === 0).length
+        const totalProducts = products.length
+        const lowStock = products.filter(p => p.quantity > 0 && p.quantity <= 10).length
+        const outOfStock = products.filter(p => p.quantity === 0).length
         const totalStockValue = products.reduce((s, p) => s + p.price * p.quantity, 0)
 
         const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
-        const todayOut   = logs.filter(l => l.type === "out" && new Date(l.date) >= todayStart)
+        const todayOut = logs.filter(l => l.type === "out" && new Date(l.date) >= todayStart)
         const salesToday = todayOut.reduce((s, l) => s + Math.abs(l.quantityAdded) * l.price, 0)
-        const unitsSold  = todayOut.reduce((s, l) => s + Math.abs(l.quantityAdded), 0)
+        const unitsSold = todayOut.reduce((s, l) => s + Math.abs(l.quantityAdded), 0)
 
         // Near-expiry (within 30 days)
         const soon = new Date(); soon.setDate(soon.getDate() + 30)
@@ -127,10 +119,7 @@ export default function DashboardHome() {
 
       {/* Near Expiry Alert */}
       {!loading && stats?.nearExpiry > 0 && (
-        <div
-          onClick={() => router.push("/dashboard/all-stock")}
-          className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 transition"
-        >
+        <div onClick={() => router.push("/dashboard/all-stock")} className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 transition" >
           <span className="text-2xl">⏰</span>
           <div>
             <p className="font-semibold text-amber-700 dark:text-amber-400">
@@ -145,18 +134,12 @@ export default function DashboardHome() {
       <div>
         <h3 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            onClick={() => router.push("/dashboard/add-product")}
-            className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all duration-200 group text-left"
-          >
+          <button onClick={() => router.push("/dashboard/add-product")} className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all duration-200 group text-left">
             <p className="text-2xl mb-2">➕</p>
             <p className="font-semibold text-emerald-700 dark:text-emerald-400 group-hover:text-white">Naya Stock Add Karo</p>
             <p className="text-xs text-emerald-600 dark:text-emerald-500 group-hover:text-emerald-100 mt-1">Products add karo ya restock karo</p>
           </button>
-          <button
-            onClick={() => router.push("/dashboard/all-stock")}
-            className="p-5 rounded-2xl bg-blue-500/10 border border-blue-400/30 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200 group text-left"
-          >
+          <button onClick={() => router.push("/dashboard/all-stock")} className="p-5 rounded-2xl bg-blue-500/10 border border-blue-400/30 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200 group text-left">
             <p className="text-2xl mb-2">📋</p>
             <p className="font-semibold text-blue-700 dark:text-blue-400 group-hover:text-white">Saara Stock Dekho</p>
             <p className="text-xs text-blue-600 dark:text-blue-500 group-hover:text-blue-100 mt-1">Inventory manage karo, stock in/out karo</p>

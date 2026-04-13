@@ -88,7 +88,7 @@ async function downloadByDateRange(from: string, to: string) {
   if (!from || !to) { toast.error("Dono dates select karo"); return }
 
   const fromDate = new Date(from)
-  const toDate   = new Date(to)
+  const toDate = new Date(to)
   toDate.setHours(23, 59, 59, 999) // to date ka poora din include karo
 
   if (fromDate > toDate) { toast.error("From date, To date se pehle honi chahiye"); return }
@@ -135,8 +135,8 @@ async function downloadByDateRange(from: string, to: string) {
 // ─────────────────────────────────────────────────────────────
 export default function SettingsPage() {
   const [isConnected, setIsConnected] = useState(false)
-  const [fromDate, setFromDate]       = useState("")
-  const [toDate, setToDate]           = useState("")
+  const [fromDate, setFromDate] = useState("")
+  const [toDate, setToDate] = useState("")
   const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
@@ -193,9 +193,8 @@ export default function SettingsPage() {
 
           <div className="flex items-center bg-[var(--bg-sidebar)] justify-between p-4 rounded-lg">
             <span className="font-medium">Google Drive</span>
-            <span className={`text-sm font-semibold px-3 py-1 rounded-full ${
-              isConnected ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
-            }`}>
+            <span className={`text-sm font-semibold px-3 py-1 rounded-full ${isConnected ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+              }`}>
               {isConnected ? "Connected ✅" : "Not Connected"}
             </span>
           </div>
@@ -215,13 +214,7 @@ export default function SettingsPage() {
           <p className="text-sm text-[var(--text-muted)]">
             Saare products aur stock logs CSV format mein download karo.
           </p>
-          <Button
-            onClick={handleDownloadAll}
-            loading={downloading}
-            variant="primary"
-            title="⬇ Download All Data"
-            className="w-full"
-          />
+          <Button onClick={handleDownloadAll} loading={downloading} variant="primary" title="⬇ Download All Data" className="w-full" />
         </div>
 
         {/* ── Download by Date Range Card ── */}
@@ -233,31 +226,14 @@ export default function SettingsPage() {
 
           <div className="flex gap-3">
             <div className="flex-1">
-              <Input
-                label="From"
-                type="date"
-                value={fromDate}
-                onChange={e => setFromDate(e.target.value)}
-              />
+              <Input label="From" type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} />
             </div>
             <div className="flex-1">
-              <Input
-                label="To"
-                type="date"
-                value={toDate}
-                onChange={e => setToDate(e.target.value)}
-              />
+              <Input label="To" type="date" value={toDate} onChange={e => setToDate(e.target.value)} />
             </div>
           </div>
 
-          <Button
-            onClick={handleDownloadRange}
-            loading={downloading}
-            variant="black"
-            title="⬇ Download Range"
-            className="w-full"
-            disabled={!fromDate || !toDate}
-          />
+          <Button onClick={handleDownloadRange} loading={downloading} variant="black" title="⬇ Download Range" className="w-full" disabled={!fromDate || !toDate} />
         </div>
 
       </div>

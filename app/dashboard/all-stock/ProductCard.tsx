@@ -11,9 +11,9 @@ type ModalType = "in" | "out" | null
 function expiryInfo(expiry?: string): { label: string; cls: string } | null {
   if (!expiry) return null
   const days = Math.ceil((new Date(expiry).getTime() - Date.now()) / 86400000)
-  if (days < 0)  return { label: "Expired",        cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
-  if (days <= 7)  return { label: `${days}d left`,  cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
-  if (days <= 30) return { label: `${days}d left`,  cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" }
+  if (days < 0) return { label: "Expired", cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
+  if (days <= 7) return { label: `${days}d left`, cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
+  if (days <= 30) return { label: `${days}d left`, cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" }
   return null
 }
 
@@ -21,22 +21,19 @@ export default function ProductCard({ product, onClick }: { product: Product; on
   const [modal, setModal] = useState<ModalType>(null)
 
   const isCritical = product.quantity > 0 && product.quantity <= 5
-  const isLow      = product.quantity > 5 && product.quantity <= 10
-  const isOut      = product.quantity === 0
+  const isLow = product.quantity > 5 && product.quantity <= 10
+  const isOut = product.quantity === 0
 
-  const stockBadge = isOut      ? { label: "Out of Stock", cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
-                   : isCritical ? { label: "Critical",     cls: "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400" }
-                   : isLow      ? { label: "Low Stock",    cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" }
-                   :              { label: "In Stock",     cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" }
+  const stockBadge = isOut ? { label: "Out of Stock", cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
+    : isCritical ? { label: "Critical", cls: "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400" }
+      : isLow ? { label: "Low Stock", cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" }
+        : { label: "In Stock", cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" }
 
   const expInfo = expiryInfo(product.expiry)
 
   return (
     <>
-      <div
-        onClick={onClick}
-        className="group relative p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-card)] shadow-[var(--shadow-card)] cursor-pointer transition-all duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col gap-4"
-      >
+      <div onClick={onClick} className="group relative p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-card)] shadow-[var(--shadow-card)] cursor-pointer transition-all duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col gap-4">
         {/* Top row */}
         <div className="flex justify-between items-start gap-2">
           <div className="min-w-0">
@@ -83,31 +80,25 @@ export default function ProductCard({ product, onClick }: { product: Product; on
             {expInfo
               ? <span className={`px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${expInfo.cls}`}>⏰ {expInfo.label}</span>
               : product.expiry
-              ? <span className="text-[var(--text-muted)] flex-shrink-0">Exp: {product.expiry}</span>
-              : null
+                ? <span className="text-[var(--text-muted)] flex-shrink-0">Exp: {product.expiry}</span>
+                : null
             }
           </div>
         )}
 
         {/* Action buttons */}
         <div className="flex gap-2 mt-auto" onClick={e => e.stopPropagation()}>
-          <Button variant="primary"  title="+ Stock In"  onClick={() => setModal("in")}  className="flex-1" />
-          <Button variant="danger"   title="− Stock Out" onClick={() => setModal("out")} disabled={isOut} className="flex-1" />
+          <Button variant="primary" title="+ Stock In" onClick={() => setModal("in")} className="flex-1" />
+          <Button variant="danger" title="− Stock Out" onClick={() => setModal("out")} disabled={isOut} className="flex-1" />
         </div>
       </div>
 
       {/* Modal */}
       {modal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4"
-          onClick={() => setModal(null)}
-        >
-          <div
-            className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-card)] p-5 sm:p-6 w-full max-w-2xl max-h-[92vh] overflow-y-auto shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={() => setModal(null)} >
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-card)] p-5 sm:p-6 w-full max-w-2xl max-h-[92vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()} >
             {modal === "in"
-              ? <StockInModal  product={product} onClose={() => setModal(null)} />
+              ? <StockInModal product={product} onClose={() => setModal(null)} />
               : <StockOutModal product={product} onClose={() => setModal(null)} />
             }
           </div>

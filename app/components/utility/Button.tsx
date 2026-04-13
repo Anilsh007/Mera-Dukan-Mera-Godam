@@ -82,8 +82,8 @@ export default function Button({
         secondary:     "bg-blue-500/10 text-blue-600 border-blue-400/40 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25",
         danger:        "bg-red-500/10 text-red-600 border-red-400/40 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-lg hover:shadow-red-500/25",
         warning:       "bg-amber-500/10 text-amber-600 border-amber-400/40 hover:bg-amber-500 hover:text-white hover:border-amber-500 hover:shadow-lg hover:shadow-amber-500/25",
-        success:       "bg-green-500 text-white border-green-500 hover:bg-green-600 hover:border-green-600 hover:shadow-lg hover:shadow-green-500/30",
-        black:         "bg-transparent text-gray-600 border-gray-300 hover:bg-gray-900 hover:text-white hover:border-gray-900 hover:shadow-lg",
+        success:       "bg-green-500/20 text-white border-green-500/50 hover:bg-green-600 hover:border-green-600 hover:shadow-lg hover:shadow-green-500/30",
+        black:         "bg-transparent text-gray-600 border-[var(--border-card)] hover:bg-gray-900 hover:text-white hover:border-gray-900 hover:shadow-lg",
 
         // always soft fill
         "soft-primary":   "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/40",
@@ -135,6 +135,7 @@ export default function Button({
                     "px-5 py-2 rounded-xl border font-medium",
                     "transition-all duration-200 ease-out",
                     "select-none",
+                    "capitalize",
                     variants[variant] ?? variants.primary,
                     isDisabled
                         ? "opacity-50 cursor-not-allowed pointer-events-none"

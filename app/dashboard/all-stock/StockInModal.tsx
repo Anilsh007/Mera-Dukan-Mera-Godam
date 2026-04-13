@@ -58,12 +58,12 @@ export default function StockInModal({
   const subtotal = (Number(form.price) || 0) * (Number(form.quantity) || 0)
 
   const handleSubmit = async () => {
-    if (!form.quantity || Number(form.quantity) <= 0) return toast.error("Quantity daalo")
-    if (!form.price || Number(form.price) <= 0) return toast.error("Price daalo")
-    if (!form.expiry) return toast.error("Expiry date daalo")
+    if (!form.quantity || Number(form.quantity) <= 0) return toast.error("Add Quantity")
+    if (!form.price || Number(form.price) <= 0) return toast.error("Add Price")
+    if (!form.expiry) return toast.error("Add Expiry Date")
 
     const userId = auth.currentUser?.uid
-    if (!userId) return toast.error("Login karein pehle")
+    if (!userId) return toast.error("User not authenticated")
 
     try {
       setLoading(true)
@@ -78,17 +78,17 @@ export default function StockInModal({
         note: form.note,
         userId,
       })
-      toast.success(`+${form.quantity} stock add ho gaya`)
+      toast.success(`+${form.quantity} stock added successfully`)
       onClose()
     } catch {
-      toast.error("Kuch gadbad hui")
+      toast.error("Failed to add stock")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <>
+    <div className="p-5 rounded-xl bg-[var(--bg-card)] border-[var(--border-card)] shadow-[var(--shadow-card)]">
       <div className="flex justify-between items-center mb-1">
         <h3 className="text-base font-semibold">Stock In</h3>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl cursor-pointer">✕</button>
@@ -115,13 +115,7 @@ export default function StockInModal({
               </div>
             ) : (
               // Price, expiry, quantity etc — editable
-              <Input
-                label={f.required ? <>{f.label} <span className="text-red-400">*</span></> : f.label}
-                type={f.type}
-                placeholder={f.placeholder}
-                value={form[f.key as keyof StockInForm]}
-                onChange={e => set(f.key as keyof StockInForm, e.target.value)}
-              />
+              <Input label={f.required ? <>{f.label} <span className="text-red-400">*</span></> : f.label} type={f.type} placeholder={f.placeholder} value={form[f.key as keyof StockInForm]} onChange={e => set(f.key as keyof StockInForm, e.target.value)} />
             )}
           </div>
         ))}
@@ -138,14 +132,8 @@ export default function StockInModal({
 
       <div className="flex gap-2 mt-6">
         <Button variant="ghost" title="Cancel" onClick={onClose} className="flex-1" />
-        <Button
-          variant="primary"
-          title="Confirm Stock In"
-          loading={loading}
-          onClick={handleSubmit}
-          className="flex-1"
-        />
+        <Button variant="primary" title="Confirm Stock In" loading={loading} onClick={handleSubmit} className="flex-1" />
       </div>
-    </>
+    </div>
   )
 }

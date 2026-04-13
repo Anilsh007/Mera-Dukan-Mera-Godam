@@ -34,11 +34,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
 
       {/* Left */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[var(--bg-primary)] transition-colors"
-          aria-label="Open menu"
-        >
+        <button onClick={onMenuClick} className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[var(--bg-primary)] transition-colors" aria-label="Open menu" >
           <Menu size={22} />
         </button>
         <img src={logo.src} className="w-8 h-8 object-contain" alt="Logo" />
@@ -76,10 +72,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                   <p className="text-xs text-[var(--text-muted)] truncate">{user?.email}</p>
                 )}
               </div>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-              >
+              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer">
                 <LogOut size={15} /> Logout
               </button>
             </div>

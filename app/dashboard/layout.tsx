@@ -14,11 +14,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <Header onMenuClick={() => setIsOpen(true)} />
 
-        <div className="flex flex-1 lg:flex-row overflow-hidden">
+        <div className="flex flex-1 overflow-hidden">
           <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
 
-          {/* main — always in-flow, sidebar overlaps via fixed+z-index on mobile */}
-          <main className="flex-1 p-4 lg:p-6 overflow-y-auto min-w-0">
+          <main className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6 transition-all duration-300">
             {children}
           </main>
         </div>
