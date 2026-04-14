@@ -1,6 +1,14 @@
 "use client"
 
-import { Boxes, Package2, IndianRupee, Tag, Truck, CalendarClock, ChevronDown } from "lucide-react"
+import {
+    Boxes,
+    Package2,
+    IndianRupee,
+    Tag,
+    Truck,
+    CalendarClock,
+    ChevronDown,
+} from "lucide-react"
 import type { Product } from "@/app/lib/db"
 
 type CategoryGroup = {
@@ -20,7 +28,7 @@ function expiryInfo(expiry?: string) {
     if (days < 0) {
         return {
             label: "Expired",
-            cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+            cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)] border border-[var(--out-stock-border)] shadow",
         }
     }
 
@@ -49,27 +57,27 @@ function getGroupStockState(products: Product[]) {
     if (totalQty === 0) {
         return {
             label: "Out of Stock",
-            cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+            cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)] border border-[var(--out-stock-border)] shadow",
         }
     }
 
     if (hasCritical) {
         return {
             label: "Critical",
-            cls: "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400",
+            cls: "bg-[var(--critical-stock)] text-[var(--critical-stock-text)] border border-[var(--critical-stock-border)] shadow",
         }
     }
 
     if (hasLow) {
         return {
             label: "Low Stock",
-            cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
+            cls: "bg-[var(--low-stock)] text-[var(--low-stock-text)] border border-[var(--low-stock-border)] shadow",
         }
     }
 
     return {
         label: "In Stock",
-        cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+        cls: "bg-[var(--all-stock)] text-[var(--all-stock-text)] border border-[var(--all-stock-border)] shadow",
     }
 }
 
@@ -86,134 +94,163 @@ export default function ProductGroupCard({
     const previewProducts = group.products.slice(0, 2)
 
     return (
-        <div className="group/card w-full break-inside-avoid rounded-3xl border-[var(--border-card)] bg-[var(--surface-card)] p-5 text-left shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 cursor-pointer">
-            {/* Main clickable card */}
+        <div className="group/card w-full h-full rounded-2xl border border-[var(--border-card)] bg-[var(--bg-card)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer">
+
+            {/* Clickable Area */}
             <div onClick={onSelect} role="button" tabIndex={0}
                 onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault()
                         onSelect()
                     }
                 }}
+                className="p-4 sm:p-5 lg:p-6"
             >
                 {/* Header */}
-                <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                            <div className="rounded-2xl bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
-                                <Boxes className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="truncate text-lg font-semibold capitalize">
-                                    {group.label}
-                                </h3>
-                            </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                    {/* Left */}
+                    <div className="min-w-0 flex items-center gap-2">
+                        <div className="rounded-xl bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 shrink-0">
+                            <Boxes className="h-4 w-4" />
                         </div>
+
+                        <h3 className="truncate text-base sm:text-lg font-semibold capitalize">
+                            {group.label}
+                        </h3>
                     </div>
 
-                    <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${stockState.cls}`}>
+                    {/* Badge */}
+                    <span
+                        className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${stockState.cls}`}
+                    >
                         {stockState.label}
                     </span>
                 </div>
 
-                {/* Summary Stats */}
-                <div className="mt-4 grid grid-cols-3 gap-3">
-                    <div className="rounded-2xl bg-[var(--surface-primary)] p-3">
-                        <div className="mb-1 flex items-center gap-1 text-sky-500">
+                {/* Stats */}
+                <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+                    <div className="rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] p-2.5 sm:p-3 text-center">
+                        <div className="mb-1 flex items-center justify-center gap-1 text-sky-500">
                             <Package2 className="h-3.5 w-3.5" />
-                            <span className="text-xs text-[var(--text-secondary)]">products</span>
+                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
+                                products
+                            </span>
                         </div>
-                        <p className="text-sm font-semibold">{group.products.length}</p>
+                        <p className="text-sm font-semibold">
+                            {group.products.length}
+                        </p>
                     </div>
 
-                    <div className="rounded-2xl bg-[var(--surface-primary)] p-3">
-                        <div className="mb-1 flex items-center gap-1 text-violet-500">
+                    <div className="rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] p-2.5 sm:p-3 text-center">
+                        <div className="mb-1 flex items-center justify-center gap-1 text-violet-500">
                             <Tag className="h-3.5 w-3.5" />
-                            <span className="text-xs text-[var(--text-secondary)]">Qty</span>
+                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
+                                Qty
+                            </span>
                         </div>
                         <p className="text-sm font-semibold">{group.totalQty}</p>
                     </div>
 
-                    <div className="rounded-2xl bg-[var(--surface-primary)] p-3">
-                        <div className="mb-1 flex items-center gap-1 text-emerald-500">
+                    <div className="rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] p-2.5 sm:p-3 text-center">
+                        <div className="mb-1 flex items-center justify-center gap-1 text-emerald-500">
                             <IndianRupee className="h-3.5 w-3.5" />
-                            <span className="text-xs text-[var(--text-secondary)]">Value</span>
+                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
+                                Value
+                            </span>
                         </div>
-                        <p className="text-sm font-semibold">
+                        <p className="text-sm font-semibold truncate">
                             ₹{group.totalValue.toLocaleString("en-IN")}
                         </p>
                     </div>
                 </div>
-            </div>
 
-            {/* Preview Products - separate section for masonry */}
-            {previewProducts.length > 0 && (
-                <div className="mt-3 space-y-2">
-                    {previewProducts.map((product) => {
-                        const expInfo = expiryInfo(product.expiry)
+                {/* Preview Products */}
+                {previewProducts.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                        {previewProducts.map((product) => {
+                            const expInfo = expiryInfo(product.expiry)
 
-                        return (
-                            <div key={product.id} className="rounded-2xl border border-[var(--border-card)] bg-[var(--surface-primary)] px-3 py-3 shadow-[var(--shadow-card)]"
-                            >
-                                <div className="flex items-start justify-between gap-3">
-                                    <div className="min-w-0">
+                            return (
+                                <div key={product.id} className="rounded-xl sm:rounded-2xl border border-[var(--border-card)] bg-[var(--surface-primary)] p-3 shadow-[var(--shadow-card)]" >
+                                    {/* Top */}
+                                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+
                                         <p className="truncate font-semibold capitalize">
                                             {product.name}
                                         </p>
+
+                                        {(product.expiry || product.supplier) && (
+                                            <div className="flex flex-wrap gap-2 text-xs">
+                                                {product.supplier && (
+                                                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-1 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300">
+                                                        <Truck className="h-3 w-3" />
+                                                        {product.supplier}
+                                                    </span>
+                                                )}
+
+                                                {(expInfo || product.expiry) && (
+                                                    <span
+                                                        className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${expInfo?.cls ||
+                                                            "bg-[var(--expire-date)] text-[var(--expire-date-text)] border border-[var(--expire-date-border)]"
+                                                            }`}
+                                                    >
+                                                        <CalendarClock className="h-3 w-3" />
+                                                        {expInfo
+                                                            ? expInfo.label
+                                                            : `Exp: ${product.expiry}`}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {(product.expiry || product.supplier) && (
-                                        <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
-                                            {product.supplier && (
-                                                <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300">
-                                                    <Truck className="h-3 w-3" />
-                                                    {product.supplier}
-                                                </span>
-                                            )}
-
-                                            {(expInfo || product.expiry) && (
-                                                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 ${expInfo?.cls || "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300"}`}>
-                                                    <CalendarClock className="h-3 w-3" />
-                                                    {expInfo ? expInfo.label : `Exp: ${product.expiry}`}
-                                                </span>
-                                            )}
+                                    {/* Bottom Stats */}
+                                    <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-center">
+                                        <div>
+                                            <p className="text-[var(--text-secondary)]">
+                                                Price
+                                            </p>
+                                            <p className="font-medium">
+                                                ₹{product.price.toLocaleString("en-IN")}
+                                            </p>
                                         </div>
-                                    )}
+
+                                        <div>
+                                            <p className="text-[var(--text-secondary)]">
+                                                Value
+                                            </p>
+                                            <p className="font-medium">
+                                                ₹
+                                                {(
+                                                    product.price * product.quantity
+                                                ).toLocaleString("en-IN")}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-[var(--text-secondary)]">
+                                                Qty
+                                            </p>
+                                            <p className="font-medium">
+                                                {product.quantity}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
+                            )
+                        })}
 
-                                <div className="mt-3 grid grid-cols-3 justify-items-center gap-3 text-xs">
-                                    <div>
-                                        <p className="text-[var(--text-secondary)]">Price</p>
-                                        <p className="font-medium">
-                                            ₹{product.price.toLocaleString("en-IN")}
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-[var(--text-secondary)]">Value</p>
-                                        <p className="font-medium">
-                                            ₹{(product.price * product.quantity).toLocaleString("en-IN")}
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-[var(--text-secondary)]">Qty</p>
-                                        <p className="font-medium">{product.quantity}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })}
-
-                    {/* See More Products Button */}
-                    {group.products.length > 2 && (
-                        <button onClick={onSelect} type="button" className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--border-card)] px-4 py-2.5 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--surface-primary)] hover:text-[var(--text-primary)] hover:shadow-md hover:border-[var(--border-primary)]" >
-                            <ChevronDown className="h-3.5 w-3.5 -rotate-90 group-hover/card-hover:rotate-0 transition-transform duration-200" />
-                            +{group.products.length - 2} Please click to see more
-                        </button>
-                    )}
-                </div>
-            )}
+                        {/* See More */}
+                        {group.products.length > 2 && (
+                            <button onClick={onSelect} type="button" className="flex w-full items-center justify-center gap-2 rounded-xl sm:rounded-2xl border border-dashed border-[var(--border-card)] px-4 py-2.5 text-xs sm:text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--surface-primary)] hover:text-[var(--text-primary)] hover:shadow-md hover:border-[var(--border-primary)]" >
+                                <ChevronDown className="h-3.5 w-3.5 -rotate-90 transition-transform duration-200 group-hover/card:rotate-0" />
+                                +{group.products.length - 2} See more
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

@@ -8,23 +8,23 @@ interface ButtonProps {
     icon?: React.ReactNode;
     className?: string;
     type?: "submit" | "reset" | "button";
-    variant?: 
-        | "primary"     // emerald — main action
-        | "secondary"   // blue — secondary action  
-        | "danger"      // red — destructive
-        | "warning"     // amber — caution
-        | "success"     // green solid — confirm
-        | "ghost"       // subtle gray
-        | "outline"     // transparent + border only
-        | "black"       // dark
-        | "dotBorder"   // dashed — add more
-        | "delete"      // icon-only delete
-        | "menu"        // mobile menu
-        | "login"       // auth screen
-        | "soft-primary"   // softer emerald fill
-        | "soft-danger"    // softer red fill
-        | "soft-warning"   // softer amber fill
-        | "soft-secondary" // softer blue fill
+    variant?:
+    | "primary"     // emerald — main action
+    | "secondary"   // blue — secondary action  
+    | "danger"      // red — destructive
+    | "warning"     // amber — caution
+    | "success"     // green solid — confirm
+    | "ghost"       // subtle gray
+    | "outline"     // transparent + border only
+    | "black"       // dark
+    | "dotBorder"   // dashed — add more
+    | "delete"      // icon-only delete
+    | "menu"        // mobile menu
+    | "login"       // auth screen
+    | "soft-primary"   // softer emerald fill
+    | "soft-danger"    // softer red fill
+    | "soft-warning"   // softer amber fill
+    | "soft-secondary" // softer blue fill
     loading?: boolean;
     disabled?: boolean;
     iconRight?: React.ReactNode; // icon on right side
@@ -50,14 +50,14 @@ export default function Button({
     const handleRipple = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (!ripple || disabled || loading) return
 
-        const btn  = btnRef.current
+        const btn = btnRef.current
         if (!btn) return
 
         const circle = document.createElement("span")
-        const rect   = btn.getBoundingClientRect()
-        const size   = Math.max(rect.width, rect.height)
-        const x      = e.clientX - rect.left - size / 2
-        const y      = e.clientY - rect.top  - size / 2
+        const rect = btn.getBoundingClientRect()
+        const size = Math.max(rect.width, rect.height)
+        const x = e.clientX - rect.left - size / 2
+        const y = e.clientY - rect.top - size / 2
 
         circle.style.cssText = `
             position: absolute;
@@ -78,26 +78,26 @@ export default function Button({
 
     const variants: Record<string, string> = {
         // solid on hover
-        primary:       "bg-emerald-500/10 text-emerald-600 border-emerald-400/40 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25",
-        secondary:     "bg-blue-500/10 text-blue-600 border-blue-400/40 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25",
-        danger:        "bg-red-500/10 text-red-600 border-red-400/40 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-lg hover:shadow-red-500/25",
-        warning:       "bg-amber-500/10 text-amber-600 border-amber-400/40 hover:bg-amber-500 hover:text-white hover:border-amber-500 hover:shadow-lg hover:shadow-amber-500/25",
-        success:       "bg-green-500/20 text-white border-green-500/50 hover:bg-green-600 hover:border-green-600 hover:shadow-lg hover:shadow-green-500/30",
-        black:         "bg-transparent text-gray-600 border-[var(--border-card)] hover:bg-gray-900 hover:text-white hover:border-gray-900 hover:shadow-lg",
+        primary: "bg-emerald-500/10 text-emerald-600 border-emerald-400/40 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25",
+        secondary: "bg-blue-500/10 text-blue-600 border-blue-400/40 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25",
+        danger: "bg-red-500/10 text-red-600 border-red-400/40 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-lg hover:shadow-red-500/25",
+        warning: "bg-amber-500/10 text-amber-600 border-amber-400/40 hover:bg-amber-500 hover:text-white hover:border-amber-500 hover:shadow-lg hover:shadow-amber-500/25",
+        success: "bg-green-500/20 text-white border-green-500/50 hover:bg-green-600 hover:border-green-600 hover:shadow-lg hover:shadow-green-500/30",
+        black: "bg-transparent text-gray-600 border-black-200 hover:bg-gray-900 hover:text-white hover:border-gray-900 hover:shadow-lg",
 
         // always soft fill
-        "soft-primary":   "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/40",
-        "soft-danger":    "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/40",
-        "soft-warning":   "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 dark:hover:bg-amber-900/40",
+        "soft-primary": "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/40",
+        "soft-danger": "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/40",
+        "soft-warning": "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 dark:hover:bg-amber-900/40",
         "soft-secondary": "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/40",
 
         // minimal
-        ghost:       "bg-gray-100 text-gray-600 border-transparent hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10",
-        outline:     "bg-transparent text-[var(--text-primary)] border-[var(--border-input)] hover:bg-[var(--bg-primary)]",
-        dotBorder:   "border-2 border-dashed border-slate-300 text-slate-400 hover:text-blue-500 hover:border-blue-400 hover:bg-blue-50 dark:border-slate-600 dark:hover:border-blue-500 dark:hover:bg-blue-900/20",
-        delete:      "border-none text-rose-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl",
-        menu:        "lg:hidden border-transparent bg-transparent text-[var(--text-primary)]",
-        login:       "border border-white/60 text-white hover:bg-white/10",
+        ghost: "bg-gray-100 text-gray-600 border-transparent hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10",
+        outline: "bg-transparent text-[var(--text-primary)] border-[var(--border-input)] hover:bg-[var(--bg-primary)]",
+        dotBorder: "border-2 border-dashed border-slate-300 text-slate-400 hover:text-blue-500 hover:border-blue-400 hover:bg-blue-50 dark:border-slate-600 dark:hover:border-blue-500 dark:hover:bg-blue-900/20",
+        delete: "border-none text-rose-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl",
+        menu: "lg:hidden border-transparent bg-transparent text-[var(--text-primary)]",
+        login: "border border-white/60 text-white hover:bg-white/10",
     }
 
     const isDisabled = loading || disabled

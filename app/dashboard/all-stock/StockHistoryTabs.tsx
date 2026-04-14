@@ -17,7 +17,6 @@ type Log = {
   productId?: number
 }
 
-// "15 Jan 2025, 03:45 PM" format
 function formatDateTime(iso: string) {
   if (!iso) return "-"
   return new Date(iso).toLocaleString("en-IN", {
@@ -30,7 +29,6 @@ function formatDateTime(iso: string) {
   })
 }
 
-// Log ko TableItem mein convert karo
 function logToRow(l: Log, productName: string): TableItem {
   const isIn = l.quantityAdded > 0
   return {
@@ -55,23 +53,33 @@ export default function StockHistoryTabs({
 }) {
   const [tab, setTab] = useState<"all" | "in" | "out">("all")
 
-  // productId → name map (quick lookup)
   const productMap = useMemo(() => {
     const map: Record<number, string> = {}
     products.forEach(p => { if (p.id) map[p.id] = p.name })
     return map
   }, [products])
 
-  const totalIn = logs
+  // ─── Quantity totals ─────────────────────────────────────────
+  const totalInQty = logs
     .filter(l => l.quantityAdded > 0)
     .reduce((s, l) => s + l.quantityAdded, 0)
 
-  const totalOut = logs
+  const totalOutQty = logs
     .filter(l => l.quantityAdded < 0)
     .reduce((s, l) => s + Math.abs(l.quantityAdded), 0)
 
+  // ─── Rupee totals ────────────────────────────────────────────
+  // In: kitna kharch hua (purchase price)
+  const totalInValue = logs
+    .filter(l => l.quantityAdded > 0)
+    .reduce((s, l) => s + l.quantityAdded * Number(l.price || 0), 0)
+
+  // Out: kitna mila (sale price)
+  const totalOutValue = logs
+    .filter(l => l.quantityAdded < 0)
+    .reduce((s, l) => s + Math.abs(l.quantityAdded) * Number(l.price || 0), 0)
+
   const tableData: TableItem[] = useMemo(() => {
-    // Filter by tab
     const filtered =
       tab === "all"
         ? [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -93,18 +101,29 @@ export default function StockHistoryTabs({
     { key: "out", label: `Stock Out (${logs.filter(l => l.quantityAdded < 0).length})` },
   ]
 
+  // ─── Summary strip (tab ke hisaab se) ────────────────────────
+  const summaryCards = tab === "all"
+    ? [
+      { label: "Total In Qty", value: `+${totalInQty}`, sub: `₹${totalInValue.toLocaleString("en-IN")} kharch`, color: "text-emerald-600 dark:text-emerald-400" },
+      { label: "Total Out Qty", value: `-${totalOutQty}`, sub: `₹${totalOutValue.toLocaleString("en-IN")} mila`, color: "text-red-500 dark:text-red-400" },
+      { label: "Net Qty", value: totalInQty - totalOutQty >= 0 ? `+${totalInQty - totalOutQty}` : `${totalInQty - totalOutQty}`, sub: "bacha hua", color: (totalInQty - totalOutQty) >= 0 ? "text-sky-600" : "text-orange-500" },
+    ]
+    : tab === "in"
+      ? [
+        { label: "Qty Added", value: `+${totalInQty}`, sub: "items aaye", color: "text-emerald-600 dark:text-emerald-400" },
+        { label: "Total Kharch", value: `₹${totalInValue.toLocaleString("en-IN")}`, sub: "purchase cost", color: "text-emerald-600 dark:text-emerald-400" },
+        { label: "Avg Price", value: totalInQty > 0 ? `₹${Math.round(totalInValue / totalInQty).toLocaleString("en-IN")}` : "—", sub: "per unit", color: "text-sky-600" },
+      ]
+      : [
+        { label: "Qty Nikali", value: `-${totalOutQty}`, sub: "items biki", color: "text-red-500 dark:text-red-400" },
+        { label: "Total Revenue", value: `₹${totalOutValue.toLocaleString("en-IN")}`, sub: "sale se mila", color: "text-red-500 dark:text-red-400" },
+        { label: "Avg Sale Price", value: totalOutQty > 0 ? `₹${Math.round(totalOutValue / totalOutQty).toLocaleString("en-IN")}` : "—", sub: "per unit", color: "text-sky-600" },
+      ]
+
   return (
-    <div className="p-5 rounded-xl bg-[var(--bg-card)] border-[var(--border-card)] shadow-[var(--shadow-card)]">
-
-      <div className="flex justify-between mb-4">
-        <h3 className="font-semibold">Stock Activity</h3>
-        <div className="text-sm">
-          <span className="text-emerald-600 mr-3">↑ In: {totalIn}</span>
-          <span className="text-red-500">↓ Out: {totalOut}</span>
-        </div>
-      </div>
-
-      <div className="flex gap-2 mb-5 flex-wrap">
+    <>
+      {/* Tab Buttons */}
+      <div className="flex gap-2 mb-4 flex-wrap">
         {tabs.map(t => (
           <Button key={t.key} variant={tab === t.key ? "primary" : "secondary"} onClick={() => setTab(t.key as any)} title={t.label} />
         ))}
@@ -115,7 +134,6 @@ export default function StockHistoryTabs({
       ) : (
         <TableComponent data={tableData} onEdit={() => { }} />
       )}
-
-    </div>
+    </>
   )
 }

@@ -11,23 +11,30 @@ type ModalType = "in" | "out" | null
 function expiryInfo(expiry?: string): { label: string; cls: string } | null {
   if (!expiry) return null
   const days = Math.ceil((new Date(expiry).getTime() - Date.now()) / 86400000)
-  if (days < 0) return { label: "Expired", cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
-  if (days <= 7) return { label: `${days}d left`, cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
-  if (days <= 30) return { label: `${days}d left`, cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" }
+  if (days < 0) return { label: "Expired", cls: "bg-[var(--expired)] text-[var(--expired-text)]" }
+  if (days <= 7) return { label: `${days}d left`, cls: "bg-[var(--expired)] text-[var(--expired-text)]" }
+  if (days <= 30) return { label: `${days}d left`, cls: "bg-[var(--low-expiry)] text-[var(--low-expiry-text)]" }
   return null
 }
 
 export default function ProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
   const [modal, setModal] = useState<ModalType>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  // Modal band hone par parent ko bhi signal dena agar onRefresh prop ho
+  const handleModalClose = () => {
+    setModal(null)
+    setRefreshKey((k) => k + 1)
+  }
 
   const isCritical = product.quantity > 0 && product.quantity <= 5
   const isLow = product.quantity > 5 && product.quantity <= 10
   const isOut = product.quantity === 0
 
-  const stockBadge = isOut ? { label: "Out of Stock", cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" }
-    : isCritical ? { label: "Critical", cls: "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400" }
-      : isLow ? { label: "Low Stock", cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" }
-        : { label: "In Stock", cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" }
+  const stockBadge = isOut ? { label: "Out of Stock", cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)]" }
+    : isCritical ? { label: "Critical", cls: "bg-[var(--critical-stock)] text-[var(--critical-stock-text)]" }
+      : isLow ? { label: "Low Stock", cls: "bg-[var(--low-stock)] text-[var(--low-stock-text)]" }
+        : { label: "In Stock", cls: "bg-[var(--all-stock)] text-[var(--all-stock-text)]" }
 
   const expInfo = expiryInfo(product.expiry)
 
@@ -95,11 +102,11 @@ export default function ProductCard({ product, onClick }: { product: Product; on
 
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={() => setModal(null)} >
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={handleModalClose} >
           <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-card)] p-5 sm:p-6 w-full max-w-2xl max-h-[92vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()} >
             {modal === "in"
-              ? <StockInModal product={product} onClose={() => setModal(null)} />
-              : <StockOutModal product={product} onClose={() => setModal(null)} />
+              ? <StockInModal product={product} onClose={handleModalClose} />
+              : <StockOutModal product={product} onClose={handleModalClose} />
             }
           </div>
         </div>
