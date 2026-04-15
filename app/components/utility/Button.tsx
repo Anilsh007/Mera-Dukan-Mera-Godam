@@ -78,12 +78,12 @@ export default function Button({
 
     const variants: Record<string, string> = {
         // solid on hover
-        primary: "bg-emerald-500/10 text-emerald-600 border-emerald-400/40 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25",
-        secondary: "bg-blue-500/10 text-blue-600 border-blue-400/40 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25",
-        danger: "bg-red-500/10 text-red-600 border-red-400/40 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-lg hover:shadow-red-500/25",
-        warning: "bg-amber-500/10 text-amber-600 border-amber-400/40 hover:bg-amber-500 hover:text-white hover:border-amber-500 hover:shadow-lg hover:shadow-amber-500/25",
-        success: "bg-green-500/20 text-white border-green-500/50 hover:bg-green-600 hover:border-green-600 hover:shadow-lg hover:shadow-green-500/30",
-        black: "bg-transparent text-gray-600 border-black-200 hover:bg-gray-900 hover:text-white hover:border-gray-900 hover:shadow-lg",
+        primary: "bg-emerald-500/10 text-emerald-600 border-emerald-400/40 hover:bg-emerald-500 hover:text-[var(--text-primary)] hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25",
+        secondary: "bg-blue-500/10 text-blue-600 border-blue-400/40 hover:bg-blue-500 hover:text-[var(--text-primary)] hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25",
+        danger: "bg-red-500/10 text-red-600 border-red-400/40 hover:bg-red-500 hover:text-[var(--text-primary)] hover:border-red-500 hover:shadow-lg hover:shadow-red-500/25",
+        warning: "bg-amber-500/10 text-amber-600 border-amber-400/40 hover:bg-amber-500 hover:text-[var(--text-primary)] hover:border-amber-500 hover:shadow-lg hover:shadow-amber-500/25",
+        success: "bg-green-500/20 text-[var(--text-primary)] border-green-500/50 hover:bg-green-600 hover:border-green-600 hover:shadow-lg hover:shadow-green-500/30",
+        black: "bg-transparent text-gray-600 border-black-200 hover:bg-gray-900 hover:text-[var(--text-primary)] hover:border-gray-900 hover:shadow-lg",
 
         // always soft fill
         "soft-primary": "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/40",
@@ -97,7 +97,7 @@ export default function Button({
         dotBorder: "border-2 border-dashed border-slate-300 text-slate-400 hover:text-blue-500 hover:border-blue-400 hover:bg-blue-50 dark:border-slate-600 dark:hover:border-blue-500 dark:hover:bg-blue-900/20",
         delete: "border-none text-rose-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl",
         menu: "lg:hidden border-transparent bg-transparent text-[var(--text-primary)]",
-        login: "border border-white/60 text-white hover:bg-white/10",
+        login: "border border-white/60 text-[var(--text-primary)] hover:bg-white/10",
     }
 
     const isDisabled = loading || disabled

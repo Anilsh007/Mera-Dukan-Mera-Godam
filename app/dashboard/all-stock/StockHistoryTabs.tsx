@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import TableComponent, { TableItem } from "@/app/components/utility/CommonTable"
 import { Product } from "@/app/lib/db"
 import Button from "@/app/components/utility/Button"
+import EditTableRowModal from "@/app/dashboard/all-stock/EditTableRowModal"
 
 type Log = {
   id: string
@@ -52,31 +53,30 @@ export default function StockHistoryTabs({
   products: Product[]
 }) {
   const [tab, setTab] = useState<"all" | "in" | "out">("all")
+  const [selectedRow, setSelectedRow] = useState<TableItem | null>(null)
 
   const productMap = useMemo(() => {
     const map: Record<number, string> = {}
-    products.forEach(p => { if (p.id) map[p.id] = p.name })
+    products.forEach((p) => {
+      if (p.id) map[p.id] = p.name
+    })
     return map
   }, [products])
 
-  // ─── Quantity totals ─────────────────────────────────────────
   const totalInQty = logs
-    .filter(l => l.quantityAdded > 0)
+    .filter((l) => l.quantityAdded > 0)
     .reduce((s, l) => s + l.quantityAdded, 0)
 
   const totalOutQty = logs
-    .filter(l => l.quantityAdded < 0)
+    .filter((l) => l.quantityAdded < 0)
     .reduce((s, l) => s + Math.abs(l.quantityAdded), 0)
 
-  // ─── Rupee totals ────────────────────────────────────────────
-  // In: how much spent (purchase price)
   const totalInValue = logs
-    .filter(l => l.quantityAdded > 0)
+    .filter((l) => l.quantityAdded > 0)
     .reduce((s, l) => s + l.quantityAdded * Number(l.price || 0), 0)
 
-  // Out: how much (sale price)
   const totalOutValue = logs
-    .filter(l => l.quantityAdded < 0)
+    .filter((l) => l.quantityAdded < 0)
     .reduce((s, l) => s + Math.abs(l.quantityAdded) * Number(l.price || 0), 0)
 
   const tableData: TableItem[] = useMemo(() => {
@@ -84,56 +84,41 @@ export default function StockHistoryTabs({
       tab === "all"
         ? [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         : logs
-          .filter(l => tab === "in" ? l.quantityAdded > 0 : l.quantityAdded < 0)
+          .filter((l) => (tab === "in" ? l.quantityAdded > 0 : l.quantityAdded < 0))
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-    return filtered.map(l => {
+    return filtered.map((l) => {
       const productName = l.productId
-        ? (productMap[l.productId] || "-")
-        : (products[0]?.name || "-")
+        ? productMap[l.productId] || "-"
+        : products[0]?.name || "-"
       return logToRow(l, productName)
     })
   }, [tab, logs, productMap, products])
 
   const tabs = [
     { key: "all", label: `All (${logs.length})` },
-    { key: "in", label: `Stock In (${logs.filter(l => l.quantityAdded > 0).length})` },
-    { key: "out", label: `Stock Out (${logs.filter(l => l.quantityAdded < 0).length})` },
+    { key: "in", label: `Stock In (${logs.filter((l) => l.quantityAdded > 0).length})` },
+    { key: "out", label: `Stock Out (${logs.filter((l) => l.quantityAdded < 0).length})` },
   ]
 
-  // ─── Summary strip (tab ke hisaab se) ────────────────────────
-  const summaryCards = tab === "all"
-    ? [
-      { label: "Total In Qty", value: `+${totalInQty}`, sub: `₹${totalInValue.toLocaleString("en-IN")} spent`, color: "text-emerald-600 dark:text-emerald-400" },
-      { label: "Total Out Qty", value: `-${totalOutQty}`, sub: `₹${totalOutValue.toLocaleString("en-IN")} earned`, color: "text-red-500 dark:text-red-400" },
-      { label: "Net Qty", value: totalInQty - totalOutQty >= 0 ? `+${totalInQty - totalOutQty}` : `${totalInQty - totalOutQty}`, sub: "remaining", color: (totalInQty - totalOutQty) >= 0 ? "text-sky-600" : "text-orange-500" },
-    ]
-    : tab === "in"
-      ? [
-        { label: "Qty Added", value: `+${totalInQty}`, sub: "items aaye", color: "text-emerald-600 dark:text-emerald-400" },
-        { label: "Total investment", value: `₹${totalInValue.toLocaleString("en-IN")}`, sub: "purchase cost", color: "text-emerald-600 dark:text-emerald-400" },
-        { label: "Avg Price", value: totalInQty > 0 ? `₹${Math.round(totalInValue / totalInQty).toLocaleString("en-IN")}` : "—", sub: "per unit", color: "text-sky-600" },
-      ]
-      : [
-        { label: "Qty Nikali", value: `-${totalOutQty}`, sub: "items biki", color: "text-red-500 dark:text-red-400" },
-        { label: "Total Revenue", value: `₹${totalOutValue.toLocaleString("en-IN")}`, sub: "earned by sales", color: "text-red-500 dark:text-red-400" },
-        { label: "Avg Sale Price", value: totalOutQty > 0 ? `₹${Math.round(totalOutValue / totalOutQty).toLocaleString("en-IN")}` : "—", sub: "per unit", color: "text-sky-600" },
-      ]
 
   return (
     <>
-      {/* Tab Buttons */}
-      <div className="flex gap-2 mb-4 flex-wrap">
-        {tabs.map(t => (
-          <Button key={t.key} variant={tab === t.key ? "primary" : "secondary"} onClick={() => setTab(t.key as any)} title={t.label} />
+      <div className="mb-4 flex flex-wrap gap-2">
+        {tabs.map((t) => (
+          <Button key={t.key} title={t.label} variant={tab === t.key ? "success" : "outline"} onClick={() => setTab(t.key as "all" | "in" | "out")} />
         ))}
       </div>
 
       {tableData.length === 0 ? (
-        <p className="text-center text-sm text-gray-400 py-8">No records found</p>
+        <div className="rounded-2xl border border-dashed border-[var(--border-card)] p-6 text-center text-[var(--text-secondary)]">
+          No records found
+        </div>
       ) : (
-        <TableComponent data={tableData} onEdit={() => { }} />
+        <TableComponent data={tableData} onEdit={(item) => setSelectedRow(item)} />
       )}
+
+      <EditTableRowModal open={selectedRow !== null} item={selectedRow} onClose={() => setSelectedRow(null)} onSave={(item) => setSelectedRow(null)} />
     </>
   )
 }

@@ -121,72 +121,63 @@ export default function ProductGrid({
     return (
         <div className="space-y-4 px-3 sm:px-4 lg:px-0">
             {/* Filters */}
-            <div className="rounded-2xl border border-[var(--border-card)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-card)] sm:p-6">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="rounded-2xl border border-[var(--border-card)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-card)] flex flex-col gap-3 lg:flex-row lg:items-center">
 
-                    {/* Search */}
-                    <div className="relative w-full lg:flex-1">
-                        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500" />
+                {/* Search */}
+                <div className="relative w-full lg:flex-2">
+                    <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500" />
 
-                        <Input type="text" placeholder="Please Enter Product Name or SKU" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-xl border border-[var(--border-input)] bg-[var(--bg-input)] py-2 pl-9 pr-9 text-sm text-[var(--text-primary)] outline-none transition-all placeholder-[var(--text-muted)] focus:ring-2 focus:ring-emerald-400" />
-                        {search && (
-                            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-rose-500 hover:text-rose-600" type="button" > <X size={14} /> </button>
-                        )}
-                    </div>
-
-                    {/* Category */}
-                    {categories.length > 0 && (
-                        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full sm:w-auto rounded-xl border border-[var(--border-input)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition-all focus:ring-2 focus:ring-emerald-400" >
-                            <option value="all">All Categories</option>
-                            {categories.map((c) => (
-                                <option key={c} value={c}>
-                                    {c}
-                                </option>
-                            ))}
-                        </select>
+                    <Input type="text" placeholder="Please Enter Product Name or SKU" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-xl border border-[var(--border-input)] bg-[var(--bg-input)] py-2 pl-9 pr-9 text-sm text-[var(--text-primary)] outline-none transition-all placeholder-[var(--text-muted)] focus:ring-2 focus:ring-emerald-400" />
+                    {search && (
+                        <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-rose-500 hover:text-rose-600" type="button" > <X size={14} /> </button>
                     )}
+                </div>
 
-                    {/* Stock Filters */}
-                    <div className="flex gap-2 overflow-x-auto">
-                        {stockFilters.map((f) => {
-                            const Icon = f.icon
-                            const active = stockFilter === f.key
-                            const count = stockCounts[f.key as keyof typeof stockCounts]
+                {/* Category */}
+                {categories.length > 0 && (
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full sm:w-auto rounded-xl border border-[var(--border-input)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition-all focus:ring-2 focus:ring-emerald-400" >
+                        <option value="all">All Categories</option>
+                        {categories.map((c) => (
+                            <option key={c} value={c}>
+                                {c}
+                            </option>
+                        ))}
+                    </select>
+                )}
 
-                            return (
-                                <button key={f.key} onClick={() => setStockFilter(f.key)} type="button" className={`relative cursor-pointer whitespace-nowrap rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 text-sm font-medium transition-all ${active ? f.active : "border-[var(--border-input)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-emerald-400"}`} >
-                                    <span className="inline-flex items-center gap-1.5">
-                                        <Icon size={14} className={active ? f.activeIcon : f.iconColor} />
-                                        <span>{f.label}</span>
-                                        <span className={`absolute -top-1 -right-1 min-w-[20px] rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${active ? "bg-white/90 text-zinc-900" : "bg-var(--surface-primary) text-var(--text-primary)"} border border-[var(--border-input)]`} >
-                                            {count}
-                                        </span>
+                {/* Stock Filters */}
+                <div className="flex gap-2 overflow-x-auto">
+                    {stockFilters.map((f) => {
+                        const Icon = f.icon
+                        const active = stockFilter === f.key
+                        const count = stockCounts[f.key as keyof typeof stockCounts]
+
+                        return (
+                            <button key={f.key} onClick={() => setStockFilter(f.key)} type="button" className={`relative cursor-pointer whitespace-nowrap rounded-xl border px-3 py-2 sm:px-4 sm:py-2 text-sm font-medium transition-all ${active ? f.active : "border-[var(--border-input)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-emerald-400"}`} >
+                                <span className="inline-flex items-center gap-1.5">
+                                    <Icon size={14} className={active ? f.activeIcon : f.iconColor} />
+                                    <span>{f.label}</span>
+                                    <span className={`absolute -top-0 -right-2 min-w-[20px] rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${active ? "bg-white/90 text-zinc-900" : "bg-var(--surface-primary) text-var(--text-primary)"} border border-[var(--border-input)]`} >
+                                        {count}
                                     </span>
-                                </button>
-                            )
-                        })}
-                    </div>
+                                </span>
+                            </button>
+                        )
+                    })}
                 </div>
             </div>
 
             {/* Products */}
             {filteredGroups.length === 0 ? (
-                <div className="rounded-3xl border border-[var(--border-card)] bg-[var(--surface-card)] p-8 text-center shadow-[var(--shadow-card)]">
-                    <p className="text-lg font-semibold">
-                        No products to display
-                    </p>
-                    <p className="text-sm text-[var(--text-secondary)]">
-                        Try adjusting your search or filter criteria.
-                    </p>
+                <div className="rounded-3xl border border-[var(--border-card)] bg-[var(--bg-card)] p-8 text-center shadow-[var(--shadow-card)]">
+                    <p className="text-lg font-semibold"> No products to display</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Try adjusting your search or filter criteria.</p>
                 </div>
             ) : (
                 <div className="columns-1 gap-4 md:columns-2 xl:columns-3 2xl:columns-4">
                     {filteredGroups.map((group) => (
                         <div key={group.key} className="mb-4 break-inside-avoid">
-                            <ProductGroupCard
-                                group={group}
-                                onSelect={() => onSelectGroup(group)}
-                            />
+                            <ProductGroupCard group={group} onSelect={() => onSelectGroup(group)} />
                         </div>
                     ))}
                 </div>
