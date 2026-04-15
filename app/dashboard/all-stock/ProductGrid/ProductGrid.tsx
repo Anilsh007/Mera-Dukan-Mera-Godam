@@ -34,15 +34,13 @@ export default function ProductGrid({
     onSelectGroup,
 }: ProductGridProps) {
     const router = useRouter()
-
     const [search, setSearch] = useState("")
     const [category, setCategory] = useState("all")
     const [stockFilter, setStockFilter] = useState("all")
 
-    const categories = useMemo(
-        () => groups.map((g) => g.label).sort(),
-        [groups]
-    )
+    const categories = useMemo(() => {
+        return groups.map((g) => g.label).sort()
+    }, [groups])
 
     const filteredGroups = useMemo(() => {
         return groups.filter((group) => {
@@ -56,19 +54,9 @@ export default function ProductGrid({
                 )
 
             const matchCategory = category === "all" || group.label === category
-
-            const totalQty = group.products.reduce(
-                (sum, p) => sum + p.quantity,
-                0
-            )
-
-            const hasCritical = group.products.some(
-                (p) => p.quantity > 0 && p.quantity <= 5
-            )
-            const hasLow = group.products.some(
-                (p) => p.quantity > 5 && p.quantity <= 10
-            )
-            const hasAnyStock = group.products.some((p) => p.quantity > 0)
+            const totalQty = group.products.reduce((sum, p) => sum + p.quantity, 0)
+            const hasCritical = group.products.some((p) => p.quantity > 0 && p.quantity <= 5)
+            const hasLow = group.products.some((p) => p.quantity > 5 && p.quantity <= 10)
 
             const matchStock =
                 stockFilter === "all"
@@ -79,11 +67,29 @@ export default function ProductGrid({
                             ? hasCritical
                             : stockFilter === "low"
                                 ? hasLow
-                                : hasAnyStock
+                                : true
 
             return matchSearch && matchCategory && matchStock
         })
     }, [groups, search, category, stockFilter])
+
+    const stockCounts = useMemo(() => {
+        return groups.reduce(
+            (acc, group) => {
+                const totalQty = group.products.reduce((sum, p) => sum + p.quantity, 0)
+                const hasCritical = group.products.some((p) => p.quantity > 0 && p.quantity <= 5)
+                const hasLow = group.products.some((p) => p.quantity > 5 && p.quantity <= 10)
+
+                acc.all += 1
+                if (totalQty === 0) acc.out += 1
+                else if (hasCritical) acc.critical += 1
+                else if (hasLow) acc.low += 1
+
+                return acc
+            },
+            { all: 0, low: 0, critical: 0, out: 0 }
+        )
+    }, [groups])
 
     if (loading) {
         return (
@@ -141,19 +147,20 @@ export default function ProductGrid({
                     )}
 
                     {/* Stock Filters */}
-                    <div className="flex gap-2 overflow-x-auto pb-1">
+                    <div className="flex gap-2 overflow-x-auto">
                         {stockFilters.map((f) => {
                             const Icon = f.icon
                             const active = stockFilter === f.key
+                            const count = stockCounts[f.key as keyof typeof stockCounts]
 
                             return (
-                                <button key={f.key} onClick={() => setStockFilter(f.key)} type="button" className={`whitespace-nowrap rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 text-sm font-medium transition-all ${active ? f.active : "border-[var(--border-input)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-emerald-400"}`} >
+                                <button key={f.key} onClick={() => setStockFilter(f.key)} type="button" className={`relative cursor-pointer whitespace-nowrap rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 text-sm font-medium transition-all ${active ? f.active : "border-[var(--border-input)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-emerald-400"}`} >
                                     <span className="inline-flex items-center gap-1.5">
-                                        <Icon
-                                            size={14}
-                                            className={active ? f.activeIcon : f.iconColor}
-                                        />
-                                        {f.label}
+                                        <Icon size={14} className={active ? f.activeIcon : f.iconColor} />
+                                        <span>{f.label}</span>
+                                        <span className={`absolute -top-1 -right-1 min-w-[20px] rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${active ? "bg-white/90 text-zinc-900" : "bg-var(--surface-primary) text-var(--text-primary)"} border border-[var(--border-input)]`} >
+                                            {count}
+                                        </span>
                                     </span>
                                 </button>
                             )

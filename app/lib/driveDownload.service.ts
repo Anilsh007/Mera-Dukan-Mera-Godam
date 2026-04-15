@@ -46,7 +46,7 @@ export async function syncFromDrive(accessToken: string) {
     const data = await loadFromDrive(accessToken);
 
     if (!data) {
-      console.log("⚠️ Drive par koi backup nahi mila");
+      console.log("⚠️ backup not found on Drive");
       return;
     }
 

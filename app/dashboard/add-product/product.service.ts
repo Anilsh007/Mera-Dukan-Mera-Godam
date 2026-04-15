@@ -83,10 +83,10 @@ export async function stockOut(data: {
   note?: string
 }) {
   const product = await db.products.get(data.productId)
-  if (!product) throw new Error("Product nahi mila")
+  if (!product) throw new Error("Product not found")
 
   if (data.quantity > product.quantity) {
-    throw new Error(`Sirf ${product.quantity} available hai`)
+    throw new Error(`Only ${product.quantity} available, cannot stock out ${data.quantity}`)
   }
 
   await db.products.update(data.productId, {

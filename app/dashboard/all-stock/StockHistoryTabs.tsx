@@ -69,12 +69,12 @@ export default function StockHistoryTabs({
     .reduce((s, l) => s + Math.abs(l.quantityAdded), 0)
 
   // ─── Rupee totals ────────────────────────────────────────────
-  // In: kitna kharch hua (purchase price)
+  // In: how much spent (purchase price)
   const totalInValue = logs
     .filter(l => l.quantityAdded > 0)
     .reduce((s, l) => s + l.quantityAdded * Number(l.price || 0), 0)
 
-  // Out: kitna mila (sale price)
+  // Out: how much (sale price)
   const totalOutValue = logs
     .filter(l => l.quantityAdded < 0)
     .reduce((s, l) => s + Math.abs(l.quantityAdded) * Number(l.price || 0), 0)
@@ -104,19 +104,19 @@ export default function StockHistoryTabs({
   // ─── Summary strip (tab ke hisaab se) ────────────────────────
   const summaryCards = tab === "all"
     ? [
-      { label: "Total In Qty", value: `+${totalInQty}`, sub: `₹${totalInValue.toLocaleString("en-IN")} kharch`, color: "text-emerald-600 dark:text-emerald-400" },
-      { label: "Total Out Qty", value: `-${totalOutQty}`, sub: `₹${totalOutValue.toLocaleString("en-IN")} mila`, color: "text-red-500 dark:text-red-400" },
-      { label: "Net Qty", value: totalInQty - totalOutQty >= 0 ? `+${totalInQty - totalOutQty}` : `${totalInQty - totalOutQty}`, sub: "bacha hua", color: (totalInQty - totalOutQty) >= 0 ? "text-sky-600" : "text-orange-500" },
+      { label: "Total In Qty", value: `+${totalInQty}`, sub: `₹${totalInValue.toLocaleString("en-IN")} spent`, color: "text-emerald-600 dark:text-emerald-400" },
+      { label: "Total Out Qty", value: `-${totalOutQty}`, sub: `₹${totalOutValue.toLocaleString("en-IN")} earned`, color: "text-red-500 dark:text-red-400" },
+      { label: "Net Qty", value: totalInQty - totalOutQty >= 0 ? `+${totalInQty - totalOutQty}` : `${totalInQty - totalOutQty}`, sub: "remaining", color: (totalInQty - totalOutQty) >= 0 ? "text-sky-600" : "text-orange-500" },
     ]
     : tab === "in"
       ? [
         { label: "Qty Added", value: `+${totalInQty}`, sub: "items aaye", color: "text-emerald-600 dark:text-emerald-400" },
-        { label: "Total Kharch", value: `₹${totalInValue.toLocaleString("en-IN")}`, sub: "purchase cost", color: "text-emerald-600 dark:text-emerald-400" },
+        { label: "Total investment", value: `₹${totalInValue.toLocaleString("en-IN")}`, sub: "purchase cost", color: "text-emerald-600 dark:text-emerald-400" },
         { label: "Avg Price", value: totalInQty > 0 ? `₹${Math.round(totalInValue / totalInQty).toLocaleString("en-IN")}` : "—", sub: "per unit", color: "text-sky-600" },
       ]
       : [
         { label: "Qty Nikali", value: `-${totalOutQty}`, sub: "items biki", color: "text-red-500 dark:text-red-400" },
-        { label: "Total Revenue", value: `₹${totalOutValue.toLocaleString("en-IN")}`, sub: "sale se mila", color: "text-red-500 dark:text-red-400" },
+        { label: "Total Revenue", value: `₹${totalOutValue.toLocaleString("en-IN")}`, sub: "earned by sales", color: "text-red-500 dark:text-red-400" },
         { label: "Avg Sale Price", value: totalOutQty > 0 ? `₹${Math.round(totalOutValue / totalOutQty).toLocaleString("en-IN")}` : "—", sub: "per unit", color: "text-sky-600" },
       ]
 
@@ -130,7 +130,7 @@ export default function StockHistoryTabs({
       </div>
 
       {tableData.length === 0 ? (
-        <p className="text-center text-sm text-gray-400 py-8">Koi record nahi mila</p>
+        <p className="text-center text-sm text-gray-400 py-8">No records found</p>
       ) : (
         <TableComponent data={tableData} onEdit={() => { }} />
       )}

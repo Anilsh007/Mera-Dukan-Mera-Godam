@@ -97,35 +97,25 @@ export default function ProductGroupCard({
         <div className="group/card w-full h-full rounded-2xl border border-[var(--border-card)] bg-[var(--bg-card)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer">
 
             {/* Clickable Area */}
-            <div onClick={onSelect} role="button" tabIndex={0}
+            <div onClick={onSelect} className="p-3" role="button" tabIndex={0}
                 onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault()
                         onSelect()
                     }
-                }}
-                className="p-4 sm:p-5 lg:p-6"
-            >
+                }} >
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
                     {/* Left */}
                     <div className="min-w-0 flex items-center gap-2">
-                        <div className="rounded-xl bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 shrink-0">
-                            <Boxes className="h-4 w-4" />
-                        </div>
+                        <div className="rounded-xl bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 shrink-0"> <Boxes className="h-4 w-4" /> </div>
 
-                        <h3 className="truncate text-base sm:text-lg font-semibold capitalize">
-                            {group.label}
-                        </h3>
+                        <h3 className="truncate text-base sm:text-lg font-semibold capitalize"> {group.label} </h3>
                     </div>
 
                     {/* Badge */}
-                    <span
-                        className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${stockState.cls}`}
-                    >
-                        {stockState.label}
-                    </span>
+                    <span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${stockState.cls}`} > {stockState.label} </span>
                 </div>
 
                 {/* Stats */}
@@ -133,21 +123,15 @@ export default function ProductGroupCard({
                     <div className="rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] p-2.5 sm:p-3 text-center">
                         <div className="mb-1 flex items-center justify-center gap-1 text-sky-500">
                             <Package2 className="h-3.5 w-3.5" />
-                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
-                                products
-                            </span>
+                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]"> products </span>
                         </div>
-                        <p className="text-sm font-semibold">
-                            {group.products.length}
-                        </p>
+                        <p className="text-sm font-semibold"> {group.products.length} </p>
                     </div>
 
                     <div className="rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] p-2.5 sm:p-3 text-center">
                         <div className="mb-1 flex items-center justify-center gap-1 text-violet-500">
                             <Tag className="h-3.5 w-3.5" />
-                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
-                                Qty
-                            </span>
+                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]"> Qty </span>
                         </div>
                         <p className="text-sm font-semibold">{group.totalQty}</p>
                     </div>
@@ -155,13 +139,9 @@ export default function ProductGroupCard({
                     <div className="rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] p-2.5 sm:p-3 text-center">
                         <div className="mb-1 flex items-center justify-center gap-1 text-emerald-500">
                             <IndianRupee className="h-3.5 w-3.5" />
-                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
-                                Value
-                            </span>
+                            <span className="text-[10px] sm:text-xs text-[var(--text-secondary)]"> Value </span>
                         </div>
-                        <p className="text-sm font-semibold truncate">
-                            ₹{group.totalValue.toLocaleString("en-IN")}
-                        </p>
+                        <p className="text-sm font-semibold truncate"> ₹{group.totalValue.toLocaleString("en-IN")} </p>
                     </div>
                 </div>
 
@@ -176,9 +156,7 @@ export default function ProductGroupCard({
                                     {/* Top */}
                                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
 
-                                        <p className="truncate font-semibold capitalize">
-                                            {product.name}
-                                        </p>
+                                        <p className="truncate font-semibold capitalize"> {product.name} </p>
 
                                         {(product.expiry || product.supplier) && (
                                             <div className="flex flex-wrap gap-2 text-xs">
@@ -190,15 +168,9 @@ export default function ProductGroupCard({
                                                 )}
 
                                                 {(expInfo || product.expiry) && (
-                                                    <span
-                                                        className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${expInfo?.cls ||
-                                                            "bg-[var(--expire-date)] text-[var(--expire-date-text)] border border-[var(--expire-date-border)]"
-                                                            }`}
-                                                    >
+                                                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${expInfo?.cls || "bg-[var(--expire-date)] text-[var(--expire-date-text)] border border-[var(--expire-date-border)]"}`} >
                                                         <CalendarClock className="h-3 w-3" />
-                                                        {expInfo
-                                                            ? expInfo.label
-                                                            : `Exp: ${product.expiry}`}
+                                                        {expInfo ? expInfo.label : `Exp: ${product.expiry}`}
                                                     </span>
                                                 )}
                                             </div>
@@ -208,33 +180,18 @@ export default function ProductGroupCard({
                                     {/* Bottom Stats */}
                                     <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-center">
                                         <div>
-                                            <p className="text-[var(--text-secondary)]">
-                                                Price
-                                            </p>
-                                            <p className="font-medium">
-                                                ₹{product.price.toLocaleString("en-IN")}
-                                            </p>
+                                            <p className="text-[var(--text-secondary)]"> Price </p>
+                                            <p className="font-medium"> ₹{product.price.toLocaleString("en-IN")} </p>
                                         </div>
 
                                         <div>
-                                            <p className="text-[var(--text-secondary)]">
-                                                Value
-                                            </p>
-                                            <p className="font-medium">
-                                                ₹
-                                                {(
-                                                    product.price * product.quantity
-                                                ).toLocaleString("en-IN")}
-                                            </p>
+                                            <p className="text-[var(--text-secondary)]"> Value </p>
+                                            <p className="font-medium"> ₹ {(product.price * product.quantity).toLocaleString("en-IN")} </p>
                                         </div>
 
                                         <div>
-                                            <p className="text-[var(--text-secondary)]">
-                                                Qty
-                                            </p>
-                                            <p className="font-medium">
-                                                {product.quantity}
-                                            </p>
+                                            <p className="text-[var(--text-secondary)]"> Qty </p>
+                                            <p className="font-medium"> {product.quantity} </p>
                                         </div>
                                     </div>
                                 </div>

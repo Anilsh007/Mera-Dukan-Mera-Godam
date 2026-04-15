@@ -77,16 +77,23 @@ export default function ProductStats({ product, logs, setModal, }: {
         tone: string
     }[] = [
             {
+                label: "Total In",
+                value: totalInQty,
+                sub: totalInValue > 0 ? `${totalInValue.toLocaleString("en-IN")} spent` : null,
+                icon: TrendingUp,
+                tone: "text-var(--all-stock-text) bg-var(--all-stock)",
+            },
+            {
                 label: "Net Qty",
                 value: product.quantity,
-                sub: "abhi available",
+                sub: "Now available",
                 icon: Package2,
                 tone: "text-var(--all-stock-text) bg-var(--all-stock)",
             },
             {
                 label: "Total Out",
                 value: totalOutQty,
-                sub: totalOutValue > 0 ? `+₹${totalOutValue.toLocaleString("en-IN")} mila` : null,
+                sub: totalOutValue > 0 ? `+₹${totalOutValue.toLocaleString("en-IN")} Earned` : null,
                 icon: TrendingDown,
                 tone: "text-[var(--out-stock-text)] bg-[var(--out-stock)]",
             },
@@ -105,8 +112,7 @@ export default function ProductStats({ product, logs, setModal, }: {
                     ? `${netProfit >= 0 ? "+" : ""}₹${Math.round(netProfit).toLocaleString("en-IN")}`
                     : "—",
                 sub: totalOutQty > 0
-                    ? netProfit >= 0 ? "faayda hua" : "nuksaan hua"
-                    : "Abhi koi sale nahi",
+                    ? netProfit >= 0 ? "Benefit" : "Loss" : "There are no sales yet",
                 icon: IndianRupee,
                 tone: totalOutQty > 0
                     ? netProfit >= 0

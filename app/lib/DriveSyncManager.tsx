@@ -65,7 +65,7 @@ export default function DriveSyncManager() {
   const handleReconnect = async () => {
     try {
       const token = await getGoogleDriveAccessToken(true);
-      if (!token) throw new Error("Token nahi mila");
+      if (!token) throw new Error("Token not obtained");
 
       localStorage.setItem("drive_connected", "true");
       setShowReconnectModal(false);

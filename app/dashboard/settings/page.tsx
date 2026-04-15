@@ -108,7 +108,7 @@ async function downloadByDateRange(from: string, to: string) {
   })
 
   if (!filteredLogs.length) {
-    toast.error("Is date range mein koi record nahi mila")
+    toast.error("no logs found in this date range ❌")
     return
   }
 

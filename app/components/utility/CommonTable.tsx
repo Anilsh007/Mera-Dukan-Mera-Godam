@@ -79,7 +79,7 @@ export default function TableComponent({ data, onEdit }: Props) {
         return (
             <div className="py-14 text-center text-[var(--text-muted)]">
                 <p className="text-4xl mb-3">📋</p>
-                <p className="text-sm">Koi record nahi mila</p>
+                <p className="text-sm">No records found</p>
             </div>
         )
     }
