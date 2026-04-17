@@ -47,10 +47,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* Profile */}
         <div className="relative" ref={ref}>
-          <button
-            onClick={() => setOpen(o => !o)}
-            className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border border-[var(--border-color)] hover:bg-[var(--bg-primary)] transition-all"
-          >
+          <button onClick={() => setOpen(o => !o)} className="cursor-pointer flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border border-[var(--border-color)] hover:bg-[var(--bg-primary)] transition-all" >
             {user?.photoURL ? (
               <img src={user.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-7 h-7 rounded-full" />
             ) : (
