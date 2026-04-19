@@ -23,5 +23,5 @@ setPersistence(auth, browserLocalPersistence);
 export const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/drive.file");
 provider.setCustomParameters({
-  prompt: "select_account",
+  //prompt: "select_account",
 });

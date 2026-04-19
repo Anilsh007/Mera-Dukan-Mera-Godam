@@ -4,7 +4,7 @@ import { signOut, onAuthStateChanged, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth, ThemeToggle } from "@/app/components/client/useClient";
 import { LogOut, Menu, User as UserIcon } from "lucide-react";
-import logo from "../../../assets/logo.svg";
+import logo from "@/assets/logo.svg";
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const router = useRouter();
@@ -38,7 +38,6 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
           <Menu size={22} />
         </button>
         <img src={logo.src} className="w-8 h-8 object-contain" alt="Logo" />
-        <span className="hidden sm:block font-semibold text-sm text-[var(--text-primary)]">Mera Dukan</span>
       </div>
 
       {/* Right */}

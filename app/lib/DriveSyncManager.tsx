@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { autoSyncToDrive } from "@/app/lib/autoSync.service";
 import { getGoogleDriveAccessToken } from "@/app/lib/auth.service";
 import { syncFromDrive } from "@/app/lib/driveDownload.service";
-import DriveReconnectModal from "@/app/components/reuseModule/DriveReconnectModal";
+import DriveReconnectModal from "@/app/lib/DriveReconnectModal";
 
 export default function DriveSyncManager() {
   const [showReconnectModal, setShowReconnectModal] = useState(false);

@@ -70,35 +70,10 @@ export default function DashboardHome() {
   }, [])
 
   const cards = [
-    {
-      label: "Total Products",
-      value: stats ? stats.totalProducts : "—",
-      icon: "📦",
-      color: "#3b82f6",
-      sub: stats?.outOfStock > 0 ? `${stats.outOfStock} out of stock` : "Sab in-stock",
-      onClick: () => router.push("/dashboard/all-stock"),
-    },
-    {
-      label: "Low Stock",
-      value: stats ? stats.lowStock : "—",
-      icon: "⚠️",
-      color: "#f59e0b",
-      sub: stats?.lowStock > 0 ? "Restocking zaroori" : "Stock theek hai",
-    },
-    {
-      label: "Aaj ki Bikri",
-      value: stats ? `₹${stats.salesToday.toLocaleString("en-IN")}` : "—",
-      icon: "💰",
-      color: "#10b981",
-      sub: stats ? `${stats.unitsSold} units biche` : "",
-    },
-    {
-      label: "Stock Value",
-      value: stats ? `₹${stats.totalStockValue.toLocaleString("en-IN")}` : "—",
-      icon: "🏦",
-      color: "#8b5cf6",
-      sub: "Current inventory value",
-    },
+    { label: "Total Products", value: stats ? stats.totalProducts : "—", icon: "📦", color: "#3b82f6", sub: stats?.outOfStock > 0 ? `${stats.outOfStock} out of stock` : "Sab in-stock", onClick: () => router.push("/dashboard/all-stock"), },
+    { label: "Low Stock", value: stats ? stats.lowStock : "—", icon: "⚠️", color: "#f59e0b", sub: stats?.lowStock > 0 ? "Restocking zaroori" : "Stock theek hai", onClick: () => router.push("/dashboard/all-stock"), },
+    { label: "Aaj ki Bikri", value: stats ? `₹${stats.salesToday.toLocaleString("en-IN")}` : "—", icon: "💰", color: "#10b981", sub: stats ? `${stats.unitsSold} units biche` : "",  onClick: () => router.push("/dashboard/all-stock"), },
+    { label: "Stock Value", value: stats ? `₹${stats.totalStockValue.toLocaleString("en-IN")}` : "—", icon: "🏦", color: "#8b5cf6", sub: "Current inventory value", onClick: () => router.push("/dashboard/all-stock"), },
   ]
 
   return (
@@ -109,7 +84,7 @@ export default function DashboardHome() {
         <h2 className="text-2xl font-bold text-[var(--text-primary)]">
           {userName ? `Namaste, ${userName} 👋` : "Overview"}
         </h2>
-        <p className="text-sm mt-1 text-[var(--text-secondary)]">Apni dukan ka aaj ka haal</p>
+        <p className="text-sm mt-1 text-[var(--text-secondary)]">The current state of my shop today</p>
       </div>
 
       {/* Stats */}

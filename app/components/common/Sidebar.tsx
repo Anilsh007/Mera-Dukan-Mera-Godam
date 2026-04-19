@@ -32,24 +32,11 @@ const navItems: NavItem[] = [
   { href: "/dashboard/add-product", label: "Add Product", icon: PlusCircle },
   { href: "/dashboard/all-stock", label: "All Stock", icon: Package },
   {
-    label: "Setting",
-    icon: Settings,
+    label: "Setting", icon: Settings,
     children: [
-      {
-        href: "/dashboard/settings/backup",
-        label: "Backup & Sync",
-        icon: Cloud,
-      },
-      {
-        href: "/dashboard/settings/download",
-        label: "Download Data",
-        icon: Download,
-      },
-      {
-        href: "/dashboard/settings/preferences",
-        label: "Preferences",
-        icon: SlidersHorizontal,
-      },
+      { href: "/dashboard/settings/backup", label: "Backup & Sync", icon: Cloud, },
+      { href: "/dashboard/settings/download", label: "Download Data", icon: Download, },
+      // { href: "/dashboard/settings/preferences", label: "Preferences", icon: SlidersHorizontal, },
     ],
   },
 ];
@@ -121,19 +108,19 @@ export default function Sidebar({
       )}
 
       <aside className={`border border-[var(--border-color)] bg-[var(--bg-sidebar)] shadow-[var(--shadow-card)]
-          flex flex-col gap-2 p-2 rounded-xl transition-all duration-300 shrink-0
+          flex flex-col gap-2 px-2 rounded-xl transition-all duration-300 shrink-0
           ${isMobile
           ? `fixed inset-y-0 left-0 z-50 m-3 ${isOpen ? "translate-x-0" : "-translate-x-[120%]"
           } w-[200px]`
           : `relative m-3 ${isCollapsed ? "w-16" : "w-[200px]"}`
         }`}>
 
-        <div className="mb-2 flex justify-start items-center relative min-h-[40px]">
-          {!isCollapsed || isMobile ? (
+        <div className="flex justify-start items-center relative">
+          {/* {!isCollapsed || isMobile ? (
             <h1 className="font-bold text-lg pl-2">Dukan & Godam</h1>
           ) : (
             <h1 className="font-bold text-lg">D&G</h1>
-          )}
+          )} */}
 
           <button onClick={handleSidebarToggle} className={`hidden lg:flex items-center justify-center w-7 h-7 rounded-full absolute top-[40dvh] right-[-20px] -translate-y-1/2 shadow-md cursor-pointer border border-[var(--border-card)] bg-[var(--bg-card)] p-2 text-[var(--text-primary)] transition hover:bg-[var(--bg-hover)]`} aria-label="Collapse sidebar" >
             <ChevronLeft size={20} className={`transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
