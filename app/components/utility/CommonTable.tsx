@@ -17,6 +17,13 @@ export interface TableItem {
 type Props = {
     data: TableItem[]
     onEdit: (item: TableItem) => void
+
+    // for print
+    showSelection?: boolean
+    selectedIds?: Set<number>
+    onToggleSelect?: (id: number) => void
+    onSelectAll?: () => void
+    onPrintRow?: (row: TableItem) => void
 }
 
 // Already-formatted strings (from StockHistoryTabs) ko dobara parse mat karo
@@ -74,7 +81,7 @@ const COLS = [
     { key: "note", label: "Note" },
 ] as const
 
-export default function TableComponent({ data, onEdit }: Props) {
+export default function TableComponent({ data, onEdit, showSelection, selectedIds, onToggleSelect, onSelectAll }: Props) {
     if (data.length === 0) {
         return (
             <div className="py-14 text-center text-[var(--text-muted)]">
@@ -91,12 +98,17 @@ export default function TableComponent({ data, onEdit }: Props) {
 
                     <thead className="bg-black/5 dark:bg-white/5">
                         <tr className="border-b border-[var(--border-card)]">
+                            {showSelection && (
+                                <th className="w-12 p-4 text-center">
+                                    <input type="checkbox" checked={selectedIds?.size === data.length && data.length > 0} onChange={onSelectAll} className="w-4 h-4 cursor-pointer" />
+                                </th>
+                            )}
                             {COLS.map(c => (
                                 <th key={c.key} className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)] whitespace-nowrap">
                                     {c.label}
                                 </th>
                             ))}
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Action</th>
+                            {/* <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Action</th> */}
                         </tr>
                     </thead>
 
@@ -104,8 +116,18 @@ export default function TableComponent({ data, onEdit }: Props) {
                         {data.map((item, i) => {
                             const total = (item.price ?? 0) * (item.quantity ?? 0)
                             return (
-                                <tr key={item.id ?? i} className="hover:bg-blue-50/40 dark:hover:bg-white/[0.03] transition-colors">
+                                <tr key={item.id ?? i} className={selectedIds?.has(item.id!) ? 'bg-[var(--selected-row)]' : 'hover:bg-emerald-50/40 dark:hover:bg-emerald/[0.03] transition-colors'}>
 
+                                    {showSelection && (
+                                        <td className="p-4 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds?.has(item.id!) || false}
+                                                onChange={() => onToggleSelect?.(item.id!)}
+                                                className="w-4 h-4 cursor-pointer"
+                                            />
+                                        </td>
+                                    )}
                                     {/* Product name */}
                                     <td className="px-4 py-3 whitespace-nowrap font-medium capitalize text-[var(--text-primary)]">
                                         {item.name || "—"}
@@ -154,9 +176,9 @@ export default function TableComponent({ data, onEdit }: Props) {
                                     </td>
 
                                     {/* Action */}
-                                    <td className="px-4 py-3 whitespace-nowrap">
+                                    {/* <td className="px-4 py-3 whitespace-nowrap">
                                         <Button title="Edit" variant="soft-primary" onClick={() => onEdit(item)} />
-                                    </td>
+                                    </td> */}
                                 </tr>
                             )
                         })}

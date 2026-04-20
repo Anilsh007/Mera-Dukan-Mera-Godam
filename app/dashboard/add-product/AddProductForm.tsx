@@ -9,6 +9,7 @@ import Input from "@/app/components/utility/CommonInput"
 import { CiWarning } from "react-icons/ci"
 import { toast } from "sonner"
 import Suggestions from "./Suggestions"
+import SuccessReceipt from "@/app/components/utility/SuccessReceipt"
 
 type ProductRow = {
     id: string; name: string; price: string; quantity: string
@@ -36,6 +37,7 @@ export default function AddProductForm() {
     const { products } = useProducts()
     const [rows, setRows] = useState<ProductRow[]>([createEmptyRow()])
     const [loading, setLoading] = useState(false)
+    const [submittedData, setSubmittedData] = useState<ProductRow[] | null>(null)
 
     const addRow = () => setRows(r => [...r, createEmptyRow()])
     const removeRow = (id: string) => rows.length > 1 && setRows(r => r.filter(x => x.id !== id))
@@ -61,12 +63,14 @@ export default function AddProductForm() {
         }
         try {
             setLoading(true)
+            const dataToSubmit = [...rows]
             for (const row of rows) {
                 const { id, ...rest } = row
                 await createProduct({ ...rest, name: row.name.trim(), price: Number(row.price), quantity: Number(row.quantity), userId: "" })
             }
-            toast.success(`✅ ${rows.length} product${rows.length > 1 ? "s" : ""} add ho gaye`)
+            toast.success(`✅ ${rows.length} product${rows.length > 1 ? "s" : ""} It will be added to your stock list.`)
             setRows([createEmptyRow()])
+            setSubmittedData(dataToSubmit)
         } catch (err) {
             console.error(err)
             toast.error("Kuch gadbad hui")
@@ -75,77 +79,95 @@ export default function AddProductForm() {
         }
     }
 
+    const handleCloseReceipt = () => {
+        setSubmittedData(null)
+        setRows([createEmptyRow()])
+    }
+
+    const handleAddMore = () => {
+        setSubmittedData(null)
+        setRows([createEmptyRow()])
+    }
+
     return (
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 bg-[var(--bg-card)] border border-[var(--border-card)] rounded-2xl shadow-[var(--shadow-card)]">
+        <>
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 bg-[var(--bg-card)] border border-[var(--border-card)] rounded-2xl shadow-[var(--shadow-card)]">
 
-            <Suggestions products={products} type="product" />
-            <Suggestions products={products} type="category" />
+                <Suggestions products={products} type="product" />
+                <Suggestions products={products} type="category" />
 
-            <p className="flex justify-end text-xs text-rose-400 font-medium mb-4">
-                * Required fields zaroor bharo
-            </p>
+                <p className="flex justify-end text-xs text-rose-400 font-medium mb-4">* Required fields are necessary to submit the form</p>
 
-            <div className="space-y-5">
-                {rows.map((row, index) => (
-                    <div key={row.id} className="border border-[var(--border-card)] rounded-xl p-4 space-y-3">
+                <div className="space-y-5">
+                    {rows.map((row, index) => (
+                        <div key={row.id} className="border border-[var(--border-card)] rounded-xl p-4 space-y-3">
 
-                        {/* Row header */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="w-7 h-7 rounded-full bg-[var(--bg-primary)] border border-[var(--border-input)] flex items-center justify-center text-xs font-bold text-[var(--text-muted)]">
-                                    {index + 1}
-                                </span>
-                                <span className="text-sm font-medium text-[var(--text-secondary)]">
-                                    {row.name ? row.name : "Naya Product"}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                {(Number(row.price) > 0 && Number(row.quantity) > 0) && (
-                                    <div className="text-right">
-                                        <p className="text-[10px] text-[var(--text-muted)] uppercase">Subtotal</p>
-                                        <p className="font-bold text-emerald-600 text-sm">
-                                            ₹{((Number(row.price)) * (Number(row.quantity))).toLocaleString("en-IN")}
-                                        </p>
-                                    </div>
-                                )}
-                                {rows.length > 1 && (
-                                    <Button type="button" onClick={() => removeRow(row.id)} icon={<MdDeleteOutline />} variant="delete" />
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Input grid — CSS grid for better mobile layout */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                            {FIELDS.map(f => (
-                                <div key={f.key} className={f.cols}>
-                                    <Input type={f.type} label={f.label} placeholder={f.placeholder} value={row[f.key as keyof ProductRow]} onChange={e => handleChange(row.id, f.key as keyof ProductRow, e.target.value)}
-                                        {...(f.datalist ? { list: f.datalist } : {})} />
+                            {/* Row header */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-7 h-7 rounded-full bg-[var(--bg-primary)] border border-[var(--border-input)] flex items-center justify-center text-xs font-bold text-[var(--text-muted)]">
+                                        {index + 1}
+                                    </span>
+                                    <span className="text-sm font-medium text-[var(--text-secondary)]">
+                                        {row.name ? row.name : "Naya Product"}
+                                    </span>
                                 </div>
-                            ))}
+                                <div className="flex items-center gap-3">
+                                    {(Number(row.price) > 0 && Number(row.quantity) > 0) && (
+                                        <div className="text-right">
+                                            <p className="text-[10px] text-[var(--text-muted)] uppercase">Subtotal</p>
+                                            <p className="font-bold text-emerald-600 text-sm">
+                                                ₹{((Number(row.price)) * (Number(row.quantity))).toLocaleString("en-IN")}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {rows.length > 1 && (
+                                        <Button type="button" onClick={() => removeRow(row.id)} icon={<MdDeleteOutline />} variant="delete" />
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Input grid — CSS grid for better mobile layout */}
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                                {FIELDS.map(f => (
+                                    <div key={f.key} className={f.cols}>
+                                        <Input type={f.type} label={f.label} placeholder={f.placeholder} value={row[f.key as keyof ProductRow]} onChange={e => handleChange(row.id, f.key as keyof ProductRow, e.target.value)}
+                                            {...(f.datalist ? { list: f.datalist } : {})} />
+                                    </div>
+                                ))}
+                            </div>
+
                         </div>
-
-                    </div>
-                ))}
-            </div>
-
-            {/* Add another */}
-            <div className="mt-4">
-                <Button type="button" title="+ Ek aur product" onClick={addRow} variant="dotBorder" icon={<MdAdd />} />
-            </div>
-
-            {/* Footer */}
-            <div className="mt-5 pt-5 border-t border-[var(--border-card)]">
-                <p className="flex items-center gap-2 text-sm text-rose-400 mb-4">
-                    <CiWarning size={18} /> Submit se pehle data check kar lo.
-                </p>
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <p className="text-xs text-[var(--text-muted)] uppercase font-medium">Grand Total</p>
-                        <p className="text-2xl font-black text-emerald-600">₹{grandTotal.toLocaleString("en-IN")}</p>
-                    </div>
-                    <Button type="submit" title={`Entry Complete Karo (${rows.length})`} variant="primary" disabled={loading || !isFormValid} loading={loading} icon={<MdOutlineAddchart />} />
+                    ))}
                 </div>
-            </div>
-        </form>
+
+                {/* Add another */}
+                <div className="mt-4">
+                    <Button type="button" title="+ Ek aur product" onClick={addRow} variant="dotBorder" icon={<MdAdd />} />
+                </div>
+
+                {/* Footer */}
+                <div className="mt-5 pt-5 border-t border-[var(--border-card)]">
+                    <p className="flex items-center gap-2 text-sm text-rose-400 mb-4">
+                        <CiWarning size={18} /> Submit se pehle data check kar lo.
+                    </p>
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p className="text-xs text-[var(--text-muted)] uppercase font-medium">Grand Total</p>
+                            <p className="text-2xl font-black text-emerald-600">₹{grandTotal.toLocaleString("en-IN")}</p>
+                        </div>
+                        <Button type="submit" title={`Entry Complete Karo (${rows.length})`} variant="primary" disabled={loading || !isFormValid} loading={loading} icon={<MdOutlineAddchart />} />
+                    </div>
+                </div>
+            </form>
+
+            {submittedData && (
+                <SuccessReceipt
+                    data={submittedData}
+                    onClose={handleCloseReceipt}
+                    onAddMore={handleAddMore}
+                />
+            )}
+        </>
     )
 }

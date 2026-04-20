@@ -43,6 +43,9 @@ html {
   --critical-stock-text: #c2410c;
   --out-stock-text: #b91c1c;
   --expire-date-text: #854d0e;
+
+  /* selected row*/
+  --selected-row: #cad5e2;
 }
 
 /* ============================================
@@ -89,6 +92,9 @@ html[data-theme="dark"] {
   --critical-stock-text: #fdba74;
   --out-stock-text: #fca5a5;
   --expire-date-text: #fde047;
+
+  /* selected row*/
+  --selected-row: #020618;
 }
 
 /* ============================================

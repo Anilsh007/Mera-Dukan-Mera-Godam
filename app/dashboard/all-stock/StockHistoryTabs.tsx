@@ -5,6 +5,8 @@ import TableComponent, { TableItem } from "@/app/components/utility/CommonTable"
 import { Product } from "@/app/lib/db"
 import Button from "@/app/components/utility/Button"
 import EditTableRowModal from "@/app/dashboard/all-stock/EditTableRowModal"
+import { MdPrint } from "react-icons/md"
+
 
 type Log = {
   id: string
@@ -45,15 +47,11 @@ function logToRow(l: Log, productName: string): TableItem {
   }
 }
 
-export default function StockHistoryTabs({
-  logs,
-  products,
-}: {
-  logs: Log[]
-  products: Product[]
-}) {
+export default function StockHistoryTabs({ logs, products }: { logs: Log[], products: Product[] }) {
   const [tab, setTab] = useState<"all" | "in" | "out">("all")
   const [selectedRow, setSelectedRow] = useState<TableItem | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [printData, setPrintData] = useState<TableItem[] | null>(null)
 
   const productMap = useMemo(() => {
     const map: Record<number, string> = {}
@@ -101,6 +99,64 @@ export default function StockHistoryTabs({
     { key: "out", label: `Stock Out (${logs.filter((l) => l.quantityAdded < 0).length})` },
   ]
 
+  const toggleSelection = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const selectAll = () => {
+    if (selectedIds.size === tableData.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(tableData.map(r => r.id!).filter(Boolean)))
+    }
+  }
+
+  // Print handler
+  const handlePrint = (rows: TableItem[]) => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const total = rows.reduce((sum, r) => sum + ((r.price ?? 0) * (r.quantity ?? 0)), 0)
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Stock Receipt</title>
+          <style>
+            body { font-family: system-ui; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background: #f3f4f6; }
+            .total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <h2>Stock Entry Receipt</h2>
+          <p>Date: ${new Date().toLocaleString("en-IN")}</p>
+          <table>
+            <tr><th>Product</th><th>Type</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+            ${rows.map(r => `
+              <tr>
+                <td>${r.name}</td>
+                <td>${r.category}</td>
+                <td>${r.quantity}</td>
+                <td>₹${r.price}</td>
+                <td>₹${((r.price ?? 0) * (r.quantity ?? 0)).toLocaleString("en-IN")}</td>
+              </tr>
+            `).join('')}
+          </table>
+          <div class="total">Grand Total: ₹${total.toLocaleString("en-IN")}</div>
+          <script>window.print();</script>
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+  }
+
 
   return (
     <>
@@ -115,7 +171,17 @@ export default function StockHistoryTabs({
           No records found
         </div>
       ) : (
-        <TableComponent data={tableData} onEdit={(item) => setSelectedRow(item)} />
+        <>
+          <TableComponent data={tableData} onEdit={(item) => setSelectedRow(item)} showSelection={true} selectedIds={selectedIds} onToggleSelect={toggleSelection} onSelectAll={selectAll} onPrintRow={(row) => handlePrint([row])} />
+
+          {selectedIds.size > 0 && (
+            <div className="flex items-center justify-end mt-4 rounded-2xl p-2 text-center text-[var(--text-secondary)] bg-[var(--bg-card)] shadow-[var(--shadow-card)] w-fit ml-auto gap-3">
+              <span className="text-sm font-medium">{selectedIds.size} selected</span>
+              <Button variant="primary" icon={<MdPrint />} title={`Print Selected`} onClick={() => handlePrint(tableData.filter(r => selectedIds.has(r.id!)))} />
+              <Button variant="outline" title="Clear" onClick={() => setSelectedIds(new Set())} />
+            </div>
+          )}
+        </>
       )}
 
       <EditTableRowModal open={selectedRow !== null} item={selectedRow} onClose={() => setSelectedRow(null)} onSave={(item) => setSelectedRow(null)} />
