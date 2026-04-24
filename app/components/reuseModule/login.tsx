@@ -6,9 +6,8 @@ import { useRouter } from "next/navigation";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import { FcGoogle } from "react-icons/fc";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import logo from "../../../assets/logo.svg";
-import { syncToDrive } from "@/app/lib/drive.service";
 import Button from "../utility/Button";
 
 const AnimatedBackground = () => {
@@ -47,13 +46,6 @@ export default function Login() {
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential?.accessToken;
 
-            setInterval(() => {
-                const token = localStorage.getItem("google_drive_token");
-                if (token) {
-                    syncToDrive(token);
-                }
-            }, 60000);
-
             router.push("/dashboard");
         } catch (error) {
             console.error("Login failed:", error);
@@ -80,7 +72,7 @@ export default function Login() {
                     </p>
                 </div>
 
-                <Button onClick={handleLogin} variant="login" icon={<FcGoogle/>} title="Continue with Google" />
+                <Button onClick={handleLogin} variant="login" icon={<FcGoogle />} title="Continue with Google" />
 
                 <p className="text-white/40 text-[10px] uppercase tracking-widest">
                     Powered by Firebase

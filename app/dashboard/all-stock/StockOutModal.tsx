@@ -26,6 +26,7 @@ export default function StockOutModal({
   const [expiryOptions, setExpiryOptions] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [logsLoading, setLogsLoading] = useState(true)
+  const isSoldFlow = reason === "Sold"
 
   // product ke sab logs fetch karo — unique expiry dates nikalenge
   useEffect(() => {
@@ -53,7 +54,8 @@ export default function StockOutModal({
 
     if (!qty || qty <= 0) return toast.error("Quantity sahi daalo")
     if (qty > product.quantity) return toast.error(`Sirf ${product.quantity} available hai`)
-    if (!price || price <= 0) return toast.error("Sale price daalo")
+    if (isSoldFlow && (!price || price <= 0)) return toast.error("Sale price daalo")
+    if (!isSoldFlow && price < 0) return toast.error("Price negative nahi ho sakta")
     if (expiryOptions.length > 0 && !selectedExpiry) return toast.error("Expiry date select karo")
     if (!product.id) return
 
@@ -62,7 +64,7 @@ export default function StockOutModal({
       await stockOut({
         productId: product.id,
         quantity: qty,
-        salePrice: price,
+        salePrice: isSoldFlow ? price : Math.max(price || 0, 0),
         expiry: selectedExpiry || undefined,
         reason,
         note,
@@ -112,12 +114,25 @@ export default function StockOutModal({
         <Input label={<>Quantity <span className="text-red-400">*</span></>} type="number" placeholder={`Max ${product.quantity}`} min={1} max={product.quantity} value={quantity} onChange={e => setQuantity(e.target.value)} />
 
         {/* Sale Price */}
-        <Input label={<>Sale Price (per unit) <span className="text-red-400">*</span></>} type="number" placeholder="How much did you sell it?" value={salePrice} onChange={e => setSalePrice(e.target.value)} />
+        <Input
+          label={
+            <>
+              {isSoldFlow ? "Sale Price (per unit)" : "Recovery Value (per unit)"}
+              {isSoldFlow && <span className="text-red-400"> *</span>}
+            </>
+          }
+          type="number"
+          placeholder={isSoldFlow ? "How much did you sell it?" : "Optional, if any amount recovered"}
+          value={salePrice}
+          onChange={e => setSalePrice(e.target.value)}
+        />
 
         {/* Live total */}
         {Number(quantity) > 0 && Number(salePrice) > 0 && (
           <div className="flex justify-between items-center px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
-            <span className="text-sm text-emerald-700 dark:text-emerald-400">Total Sale Value</span>
+            <span className="text-sm text-emerald-700 dark:text-emerald-400">
+              {isSoldFlow ? "Total Sale Value" : "Total Recovery Value"}
+            </span>
             <span className="font-bold text-emerald-600">
               ₹{(Number(quantity) * Number(salePrice)).toLocaleString("en-IN")}
             </span>
@@ -139,7 +154,7 @@ export default function StockOutModal({
 
       <div className="flex gap-2 mt-6">
         <Button variant="ghost" title="Cancel" onClick={onClose} className="flex-1" />
-        <Button variant="danger" title="Confirm Stock Out" loading={loading} onClick={handleSubmit} className="flex-1" />
+        <Button variant="danger" title={isSoldFlow ? "Confirm Sale Stock" : "Confirm Stock Out"} loading={loading} onClick={handleSubmit} className="flex-1" />
       </div>
     </div>
   )

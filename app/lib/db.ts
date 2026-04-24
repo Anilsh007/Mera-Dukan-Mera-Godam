@@ -1,7 +1,8 @@
 import Dexie, { Table } from "dexie";
+import type { ProfileData } from "./profile.service";
 
 export interface Product {
-  id?: number
+  id: string
   name: string
   price: number
   quantity: number
@@ -15,21 +16,24 @@ export interface Product {
 }
 
 export interface ProductLog {
-  id?: number
-  productId: number
-  quantityAdded: number  // positive = in, negative = out
+  id: string
+  productId: string
+  quantityAdded: number
   type: "in" | "out"
   reason?: string
   price: number
-  expiry?: string        // ✅ NEW — us batch ki expiry
+  expiry?: string
   date: string
   note?: string
 }
+
+export interface ProfileRecord extends ProfileData {}
 
 class StockDB extends Dexie {
 
   products!: Table<Product>
   productLogs!: Table<ProductLog>
+  profiles!: Table<ProfileRecord>
 
   constructor() {
     super("StockDatabase")
@@ -48,11 +52,16 @@ class StockDB extends Dexie {
       })
     })
 
-    // version 5 — expiry field add kiya ProductLog mein
-    this.version(5).stores({
-      products: "++id,[userId+name+category],userId,name,price,quantity,category,sku,createdAt",
-      productLogs: "++id,productId,date,type"
-    })
+    // version 6 — expiry field add kiya ProductLog mein
+    this.version(6).stores({
+      products: "id,[userId+name+category],userId,name,category",
+      productLogs: "id,productId,date,type"
+    });
+    this.version(7).stores({
+      products: "id,[userId+name+category],userId,name,category",
+      productLogs: "id,productId,date,type",
+      profiles: "userId,updatedAt"
+    });
     // no upgrade needed — expiry optional hai, purane logs mein undefined rahega
   }
 

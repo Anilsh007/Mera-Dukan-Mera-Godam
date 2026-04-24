@@ -5,38 +5,28 @@ import { Product } from "@/app/lib/db"
 import Button from "@/app/components/utility/Button"
 import StockInModal from "./StockInModal"
 import StockOutModal from "./StockOutModal"
+import { getExpiryInfo, getStockLevel } from "@/app/lib/inventory.utils"
 
 type ModalType = "in" | "out" | null
 
-function expiryInfo(expiry?: string): { label: string; cls: string } | null {
-  if (!expiry) return null
-  const days = Math.ceil((new Date(expiry).getTime() - Date.now()) / 86400000)
-  if (days < 0) return { label: "Expired", cls: "bg-[var(--expired)] text-[var(--expired-text)]" }
-  if (days <= 7) return { label: `${days}d left`, cls: "bg-[var(--expired)] text-[var(--expired-text)]" }
-  if (days <= 30) return { label: `${days}d left`, cls: "bg-[var(--low-expiry)] text-[var(--low-expiry-text)]" }
-  return null
-}
-
 export default function ProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
   const [modal, setModal] = useState<ModalType>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
 
-  // Modal band hone par parent ko bhi signal dena agar onRefresh prop ho
   const handleModalClose = () => {
     setModal(null)
-    setRefreshKey((k) => k + 1)
   }
 
-  const isCritical = product.quantity > 0 && product.quantity <= 5
-  const isLow = product.quantity > 5 && product.quantity <= 10
-  const isOut = product.quantity === 0
+  const stockLevel = getStockLevel(product.quantity)
+  const isCritical = stockLevel === "critical"
+  const isLow = stockLevel === "low"
+  const isOut = stockLevel === "out"
 
   const stockBadge = isOut ? { label: "Out of Stock", cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)]" }
     : isCritical ? { label: "Critical", cls: "bg-[var(--critical-stock)] text-[var(--critical-stock-text)]" }
       : isLow ? { label: "Low Stock", cls: "bg-[var(--low-stock)] text-[var(--low-stock-text)]" }
         : { label: "In Stock", cls: "bg-[var(--all-stock)] text-[var(--all-stock-text)]" }
 
-  const expInfo = expiryInfo(product.expiry)
+  const expInfo = getExpiryInfo(product.expiry)
 
   return (
     <>

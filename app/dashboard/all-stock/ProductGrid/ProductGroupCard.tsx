@@ -1,84 +1,26 @@
 "use client"
 
 import {
+    AlertTriangle,
     Boxes,
+    CircleOff,
     Package2,
     IndianRupee,
     Tag,
     Truck,
     CalendarClock,
     ChevronDown,
+    Siren,
 } from "lucide-react"
 import type { Product } from "@/app/lib/db"
+import { getExpiryInfo, getGroupStockLevel, getStockLevel } from "@/app/lib/inventory.utils"
 
 type CategoryGroup = {
     label: string
     products: Product[]
     totalQty: number
     totalValue: number
-}
-
-function expiryInfo(expiry?: string) {
-    if (!expiry) return null
-
-    const days = Math.ceil(
-        (new Date(expiry).getTime() - Date.now()) / 86400000
-    )
-
-    if (days < 0) {
-        return {
-            label: "Expired",
-            cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)] border border-[var(--out-stock-border)] shadow",
-        }
-    }
-
-    if (days <= 7) {
-        return {
-            label: `${days}d left`,
-            cls: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
-        }
-    }
-
-    if (days <= 30) {
-        return {
-            label: `${days}d left`,
-            cls: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
-        }
-    }
-
-    return null
-}
-
-function getGroupStockState(products: Product[]) {
-    const totalQty = products.reduce((sum, p) => sum + p.quantity, 0)
-    const hasCritical = products.some((p) => p.quantity > 0 && p.quantity <= 5)
-    const hasLow = products.some((p) => p.quantity > 5 && p.quantity <= 10)
-
-    if (totalQty === 0) {
-        return {
-            label: "Out of Stock",
-            cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)] border border-[var(--out-stock-border)] shadow",
-        }
-    }
-
-    if (hasCritical) {
-        return {
-            label: "Critical",
-            cls: "bg-[var(--critical-stock)] text-[var(--critical-stock-text)] border border-[var(--critical-stock-border)] shadow",
-        }
-    }
-
-    if (hasLow) {
-        return {
-            label: "Low Stock",
-            cls: "bg-[var(--low-stock)] text-[var(--low-stock-text)] border border-[var(--low-stock-border)] shadow",
-        }
-    }
-
-    return {
-        label: "In Stock",
-        cls: "bg-[var(--all-stock)] text-[var(--all-stock-text)] border border-[var(--all-stock-border)] shadow",
-    }
+    visibleProducts?: Product[]
 }
 
 type ProductGroupCardProps = {
@@ -90,8 +32,28 @@ export default function ProductGroupCard({
     group,
     onSelect,
 }: ProductGroupCardProps) {
-    const stockState = getGroupStockState(group.products)
-    const previewProducts = group.products.slice(0, 2)
+    const stockLevel = getGroupStockLevel(group.products)
+    const stockState = stockLevel === "out"
+        ? {
+            label: "Out of Stock",
+            cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)] border border-[var(--out-stock-border)] shadow",
+        }
+        : stockLevel === "critical"
+            ? {
+                label: "Critical",
+                cls: "bg-[var(--critical-stock)] text-[var(--critical-stock-text)] border border-[var(--critical-stock-border)] shadow",
+            }
+            : stockLevel === "low"
+                ? {
+                    label: "Low Stock",
+                    cls: "bg-[var(--low-stock)] text-[var(--low-stock-text)] border border-[var(--low-stock-border)] shadow",
+                }
+                : {
+                    label: "In Stock",
+                    cls: "bg-[var(--all-stock)] text-[var(--all-stock-text)] border border-[var(--all-stock-border)] shadow",
+                }
+    const visibleProducts = group.visibleProducts ?? group.products
+    const previewProducts = visibleProducts.slice(0, 2)
 
     return (
         <div className="group/card w-full h-full rounded-2xl border border-[var(--border-card)] bg-[var(--bg-card)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer">
@@ -149,7 +111,28 @@ export default function ProductGroupCard({
                 {previewProducts.length > 0 && (
                     <div className="mt-3 space-y-2">
                         {previewProducts.map((product) => {
-                            const expInfo = expiryInfo(product.expiry)
+                            const expInfo = getExpiryInfo(product.expiry)
+                            const productStockLevel = getStockLevel(product.quantity)
+                            const stockIndicator =
+                                productStockLevel === "out"
+                                    ? {
+                                        icon: CircleOff,
+                                        label: "Out",
+                                        cls: "bg-[var(--out-stock)] text-[var(--out-stock-text)] border border-[var(--out-stock-border)]",
+                                    }
+                                    : productStockLevel === "critical"
+                                        ? {
+                                            icon: Siren,
+                                            label: "Critical",
+                                            cls: "bg-[var(--critical-stock)] text-[var(--critical-stock-text)] border border-[var(--critical-stock-border)]",
+                                        }
+                                        : productStockLevel === "low"
+                                            ? {
+                                                icon: AlertTriangle,
+                                                label: "Low",
+                                                cls: "bg-[var(--low-stock)] text-[var(--low-stock-text)] border border-[var(--low-stock-border)]",
+                                            }
+                                            : null
 
                             return (
                                 <div key={product.id} className="rounded-xl sm:rounded-2xl border border-[var(--border-card)] bg-[var(--surface-primary)] p-3 shadow-[var(--shadow-card)]" >
@@ -164,6 +147,13 @@ export default function ProductGroupCard({
                                                     <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-1 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300">
                                                         <Truck className="h-3 w-3" />
                                                         {product.supplier}
+                                                    </span>
+                                                )}
+
+                                                {stockIndicator && (
+                                                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${stockIndicator.cls}`}>
+                                                        <stockIndicator.icon className="h-3 w-3" />
+                                                        {stockIndicator.label}
                                                     </span>
                                                 )}
 
@@ -199,10 +189,10 @@ export default function ProductGroupCard({
                         })}
 
                         {/* See More */}
-                        {group.products.length > 2 && (
+                        {visibleProducts.length > 2 && (
                             <button onClick={onSelect} type="button" className="flex w-full items-center justify-center gap-2 rounded-xl sm:rounded-2xl border border-dashed border-[var(--border-card)] px-4 py-2.5 text-xs sm:text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--surface-primary)] hover:text-[var(--text-primary)] hover:shadow-md hover:border-[var(--border-primary)]" >
                                 <ChevronDown className="h-3.5 w-3.5 -rotate-90 transition-transform duration-200 group-hover/card:rotate-0" />
-                                +{group.products.length - 2} See more
+                                +{visibleProducts.length - 2} See more
                             </button>
                         )}
                     </div>

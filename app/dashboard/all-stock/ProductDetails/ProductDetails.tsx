@@ -27,7 +27,7 @@ type Log = {
   price: number
   expiry?: string
   note?: string
-  productId?: number
+  productId?: string
 }
 
 export default function ProductDetails({
@@ -37,8 +37,8 @@ export default function ProductDetails({
   onBack,
 }: {
   group: CategoryGroup
-  activeProductId: number | null
-  onChangeProduct: (productId: number | null) => void
+  activeProductId: string | null
+  onChangeProduct: (productId: string | null) => void
   onBack?: () => void
 }) {
   const [logs, setLogs] = useState<Log[]>([])

@@ -14,6 +14,7 @@ import Button from "@/app/components/utility/Button"
 import type { CategoryGroup } from "../page"
 import ProductGroupCard from "./ProductGroupCard"
 import Input from "@/app/components/utility/CommonInput"
+import { getGroupStockCounts, getStockLevel, matchesGroupStockFilter, type StockFilter } from "@/app/lib/inventory.utils"
 
 const stockFilters = [
     { key: "all", label: "All", icon: LayoutList, active: "bg-[var(--all-stock)] text-[var(--text-secondary)] border-[var(--all-stock-border)] shadow", iconColor: "text-sky-500", activeIcon: "text-[var(--text-secondary)]", },
@@ -36,59 +37,44 @@ export default function ProductGrid({
     const router = useRouter()
     const [search, setSearch] = useState("")
     const [category, setCategory] = useState("all")
-    const [stockFilter, setStockFilter] = useState("all")
+    const [stockFilter, setStockFilter] = useState<StockFilter>("all")
 
     const categories = useMemo(() => {
         return groups.map((g) => g.label).sort()
     }, [groups])
 
     const filteredGroups = useMemo(() => {
-        return groups.filter((group) => {
+        return groups
+            .map((group) => {
+                const visibleProducts =
+                    stockFilter === "all"
+                        ? group.products
+                        : group.products.filter((product) => getStockLevel(product.quantity) === stockFilter)
+
+                return {
+                    ...group,
+                    visibleProducts,
+                }
+            })
+            .filter((group) => {
             const matchSearch =
                 !search ||
                 group.label.toLowerCase().includes(search.toLowerCase()) ||
-                group.products.some(
+                group.visibleProducts.some(
                     (p) =>
                         p.name.toLowerCase().includes(search.toLowerCase()) ||
                         (p.sku || "").toLowerCase().includes(search.toLowerCase())
                 )
 
             const matchCategory = category === "all" || group.label === category
-            const totalQty = group.products.reduce((sum, p) => sum + p.quantity, 0)
-            const hasCritical = group.products.some((p) => p.quantity > 0 && p.quantity <= 5)
-            const hasLow = group.products.some((p) => p.quantity > 5 && p.quantity <= 10)
-
-            const matchStock =
-                stockFilter === "all"
-                    ? true
-                    : stockFilter === "out"
-                        ? totalQty === 0
-                        : stockFilter === "critical"
-                            ? hasCritical
-                            : stockFilter === "low"
-                                ? hasLow
-                                : true
+            const matchStock = matchesGroupStockFilter(group.products, stockFilter)
 
             return matchSearch && matchCategory && matchStock
         })
     }, [groups, search, category, stockFilter])
 
     const stockCounts = useMemo(() => {
-        return groups.reduce(
-            (acc, group) => {
-                const totalQty = group.products.reduce((sum, p) => sum + p.quantity, 0)
-                const hasCritical = group.products.some((p) => p.quantity > 0 && p.quantity <= 5)
-                const hasLow = group.products.some((p) => p.quantity > 5 && p.quantity <= 10)
-
-                acc.all += 1
-                if (totalQty === 0) acc.out += 1
-                else if (hasCritical) acc.critical += 1
-                else if (hasLow) acc.low += 1
-
-                return acc
-            },
-            { all: 0, low: 0, critical: 0, out: 0 }
-        )
+        return getGroupStockCounts(groups)
     }, [groups])
 
     if (loading) {

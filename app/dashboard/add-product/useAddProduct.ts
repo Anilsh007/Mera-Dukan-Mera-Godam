@@ -1,10 +1,15 @@
 import { db, Product } from "@/app/lib/db";
 import { auth } from "@/app/lib/firebase";
-import { scheduleSync } from "@/app/lib/syncManager";
+import { autoSyncToSupabase } from "@/app/lib/autoSupabaseSync.service";
+import { v4 as uuidv4 } from "uuid";
 
 export default function useAddProduct() {
 
-  const createProduct = async (product: Omit<Product, "id" | "createdAt">) => {
+  const createProduct = async (
+    product: Omit<Product, "id" | "createdAt">,
+    options?: { skipImmediateSync?: boolean }
+  ) => {
+
     const userId = auth.currentUser?.uid;
     if (!userId) throw new Error("User not logged in");
 
@@ -23,6 +28,7 @@ export default function useAddProduct() {
       });
 
       await db.productLogs.add({
+        id: uuidv4(),
         productId: existing.id!,
         quantityAdded: Number(product.quantity),
         type: "in",
@@ -32,10 +38,11 @@ export default function useAddProduct() {
       });
 
     } else {
-      // ✅ FIX: ...spread nahi, explicit fields —
-      // agar koi bhi extra value (JSX, Promise) product object mein thi,
-      // ab wo IndexedDB mein nahi jayegi → DataCloneError khatam
-      const newId = await db.products.add({
+
+      const newId = uuidv4();
+
+      await db.products.add({
+        id: newId,
         name: normalizedName,
         price: Number(product.price),
         quantity: Number(product.quantity),
@@ -49,7 +56,8 @@ export default function useAddProduct() {
       });
 
       await db.productLogs.add({
-        productId: newId as number,
+        id: uuidv4(),
+        productId: newId,
         quantityAdded: Number(product.quantity),
         type: "in",
         price: Number(product.price),
@@ -58,7 +66,9 @@ export default function useAddProduct() {
       });
     }
 
-    scheduleSync();
+    if (!options?.skipImmediateSync) {
+      await autoSyncToSupabase();
+    }
   };
 
   return { createProduct };

@@ -1,3 +1,5 @@
+import { useId } from "react"
+
 // Input.tsx
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: React.ReactNode
@@ -13,7 +15,8 @@ export default function Input({
     datalist,
     ...props
 }: InputProps) {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`
+    const generatedId = useId()
+    const inputId = id || generatedId
 
     return (
         <div className={containerClassName}>

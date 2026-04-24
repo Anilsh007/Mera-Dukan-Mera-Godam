@@ -10,16 +10,26 @@ import { CiWarning } from "react-icons/ci"
 import { toast } from "sonner"
 import Suggestions from "./Suggestions"
 import SuccessReceipt from "@/app/components/utility/SuccessReceipt"
+import { autoSyncToSupabase } from "@/app/lib/autoSupabaseSync.service"
 
 type ProductRow = {
     id: string; name: string; price: string; quantity: string
     category: string; supplier: string; expiry: string; note: string; sku: string
 }
 
+import { v4 as uuidv4 } from "uuid";
+
 const createEmptyRow = (): ProductRow => ({
-    id: Math.random().toString(36).substr(2, 9),
-    name: "", price: "", quantity: "", category: "", supplier: "", expiry: "", note: "", sku: ""
-})
+    id: uuidv4(),
+    name: "",
+    price: "",
+    quantity: "",
+    category: "",
+    supplier: "",
+    expiry: "",
+    note: "",
+    sku: ""
+});
 
 const FIELDS = [
     { key: "name", label: <>Product Name <span className="text-red-500">*</span></>, required: true, type: "text", placeholder: "Enter product name", datalist: "productNames", cols: "col-span-2 sm:col-span-1 lg:col-span-2" },
@@ -66,8 +76,12 @@ export default function AddProductForm() {
             const dataToSubmit = [...rows]
             for (const row of rows) {
                 const { id, ...rest } = row
-                await createProduct({ ...rest, name: row.name.trim(), price: Number(row.price), quantity: Number(row.quantity), userId: "" })
+                await createProduct(
+                    { ...rest, name: row.name.trim(), price: Number(row.price), quantity: Number(row.quantity), userId: "" },
+                    { skipImmediateSync: true }
+                )
             }
+            await autoSyncToSupabase()
             toast.success(`✅ ${rows.length} product${rows.length > 1 ? "s" : ""} It will be added to your stock list.`)
             setRows([createEmptyRow()])
             setSubmittedData(dataToSubmit)

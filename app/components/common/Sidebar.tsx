@@ -3,18 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Package,
-  PlusCircle,
-  ChevronLeft,
-  Settings,
-  ChevronDown,
-  ChevronRight,
-  Cloud,
-  Download,
-  SlidersHorizontal,
-} from "lucide-react";
+import { LayoutDashboard, Package, PlusCircle, ChevronLeft, Settings, ChevronDown, ChevronRight, Cloud, Download, SlidersHorizontal, } from "lucide-react";
 
 type NavItem = {
   href?: string;
@@ -31,6 +20,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/add-product", label: "Add Product", icon: PlusCircle },
   { href: "/dashboard/all-stock", label: "All Stock", icon: Package },
+  { href: "/dashboard/gst-invoice", label: "GST Invoice", icon: SlidersHorizontal },
   {
     label: "Setting", icon: Settings,
     children: [

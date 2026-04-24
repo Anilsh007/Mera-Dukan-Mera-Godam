@@ -20,7 +20,7 @@ function normalizeCategory(category?: string) {
 
 export default function AllStockPage() {
   const [selectedGroup, setSelectedGroup] = useState<CategoryGroup | null>(null)
-  const [activeProductId, setActiveProductId] = useState<number | null>(null)
+  const [activeProductId, setActiveProductId] = useState<string | null>(null)
   const { products, loading } = useProducts()
 
   const groupedProducts = useMemo<CategoryGroup[]>(() => {

@@ -17,7 +17,7 @@ type Log = {
   price: number
   expiry?: string
   note?: string
-  productId?: number
+  productId?: string
 }
 
 function formatDateTime(iso: string) {
@@ -35,7 +35,7 @@ function formatDateTime(iso: string) {
 function logToRow(l: Log, productName: string): TableItem {
   const isIn = l.quantityAdded > 0
   return {
-    id: Number(l.id),
+    id: l.id,
     name: productName,
     category: isIn ? "Stock In ↑" : "Stock Out ↓",
     supplier: l.reason || "-",
@@ -50,11 +50,11 @@ function logToRow(l: Log, productName: string): TableItem {
 export default function StockHistoryTabs({ logs, products }: { logs: Log[], products: Product[] }) {
   const [tab, setTab] = useState<"all" | "in" | "out">("all")
   const [selectedRow, setSelectedRow] = useState<TableItem | null>(null)
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set())
   const [printData, setPrintData] = useState<TableItem[] | null>(null)
 
   const productMap = useMemo(() => {
-    const map: Record<number, string> = {}
+    const map: Record<string, string> = {}
     products.forEach((p) => {
       if (p.id) map[p.id] = p.name
     })
@@ -99,7 +99,7 @@ export default function StockHistoryTabs({ logs, products }: { logs: Log[], prod
     { key: "out", label: `Stock Out (${logs.filter((l) => l.quantityAdded < 0).length})` },
   ]
 
-  const toggleSelection = (id: number) => {
+  const toggleSelection = (id: string | number) => {
     setSelectedIds(prev => {
       const next = new Set(prev)
       next.has(id) ? next.delete(id) : next.add(id)
@@ -111,7 +111,7 @@ export default function StockHistoryTabs({ logs, products }: { logs: Log[], prod
     if (selectedIds.size === tableData.length) {
       setSelectedIds(new Set())
     } else {
-      setSelectedIds(new Set(tableData.map(r => r.id!).filter(Boolean)))
+      setSelectedIds(new Set(tableData.map(r => r.id).filter((id): id is string | number => id !== undefined && id !== null)))
     }
   }
 

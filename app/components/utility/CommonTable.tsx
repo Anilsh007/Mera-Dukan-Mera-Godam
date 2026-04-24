@@ -1,9 +1,10 @@
 "use client"
 
 import Button from "@/app/components/utility/Button"
+import { getStockLevel } from "@/app/lib/inventory.utils"
 
 export interface TableItem {
-    id?: number
+    id?: string | number
     name?: string
     category?: string
     supplier?: string
@@ -20,10 +21,14 @@ type Props = {
 
     // for print
     showSelection?: boolean
-    selectedIds?: Set<number>
-    onToggleSelect?: (id: number) => void
+    selectedIds?: Set<string | number>
+    onToggleSelect?: (id: string | number) => void
     onSelectAll?: () => void
     onPrintRow?: (row: TableItem) => void
+}
+
+function getRowId(item: TableItem, index: number) {
+    return item.id ?? `row-${index}`
 }
 
 // Already-formatted strings (from StockHistoryTabs) ko dobara parse mat karo
@@ -50,8 +55,9 @@ function ExpiryCell({ val }: { val?: string }) {
 
 function QtyCell({ qty }: { qty?: number }) {
     const q = qty ?? 0
-    const dot = q === 0 ? "bg-red-500" : q <= 5 ? "bg-red-400" : q <= 10 ? "bg-amber-400" : "bg-emerald-500"
-    const txt = q === 0 ? "text-red-500 font-semibold" : q <= 10 ? "text-amber-600" : "text-[var(--text-primary)]"
+    const stockLevel = getStockLevel(q)
+    const dot = stockLevel === "out" ? "bg-red-500" : stockLevel === "critical" ? "bg-red-400" : stockLevel === "low" ? "bg-amber-400" : "bg-emerald-500"
+    const txt = stockLevel === "out" ? "text-red-500 font-semibold" : stockLevel === "critical" || stockLevel === "low" ? "text-amber-600" : "text-[var(--text-primary)]"
     return (
         <span className={`inline-flex items-center gap-1.5 ${txt}`}>
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
@@ -115,15 +121,16 @@ export default function TableComponent({ data, onEdit, showSelection, selectedId
                     <tbody className="divide-y divide-[var(--border-card)]">
                         {data.map((item, i) => {
                             const total = (item.price ?? 0) * (item.quantity ?? 0)
+                            const rowId = getRowId(item, i)
                             return (
-                                <tr key={item.id ?? i} className={selectedIds?.has(item.id!) ? 'bg-[var(--selected-row)]' : 'hover:bg-emerald-50/40 dark:hover:bg-emerald/[0.03] transition-colors'}>
+                                <tr key={rowId} className={selectedIds?.has(rowId) ? 'bg-[var(--selected-row)]' : 'hover:bg-emerald-50/40 dark:hover:bg-emerald/[0.03] transition-colors'}>
 
                                     {showSelection && (
                                         <td className="p-4 text-center">
                                             <input
                                                 type="checkbox"
-                                                checked={selectedIds?.has(item.id!) || false}
-                                                onChange={() => onToggleSelect?.(item.id!)}
+                                                checked={selectedIds?.has(rowId) || false}
+                                                onChange={() => onToggleSelect?.(rowId)}
                                                 className="w-4 h-4 cursor-pointer"
                                             />
                                         </td>

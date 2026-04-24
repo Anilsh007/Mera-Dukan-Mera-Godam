@@ -17,7 +17,9 @@ export default function useProducts() {
 
       // ✅ liveQuery — Dexie ka sahi tarika hai changes sunne ka
       // hooks ki zaroorat nahi, aur Promise return karne wala bug bhi nahi
-      const subscription = liveQuery(() => db.products.toArray()).subscribe({
+      const subscription = liveQuery(() =>
+        db.products.where("userId").equals(user.uid).toArray()
+      ).subscribe({
         next: (data) => {
           setProducts(data);
           setLoading(false);

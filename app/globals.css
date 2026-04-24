@@ -105,6 +105,19 @@ body {
   color: var(--text-primary);
 }
 
+html {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sidebar-active);
+  outline-offset: 2px;
+}
+
 /* ============================================
    SCROLLBAR
    ============================================ */

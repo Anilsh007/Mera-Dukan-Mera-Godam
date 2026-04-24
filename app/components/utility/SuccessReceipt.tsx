@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useMemo, useRef } from "react"
 import { MdCheckCircle, MdPrint, MdClose } from "react-icons/md"
 import Button from "./Button"
 
@@ -24,6 +24,10 @@ interface SuccessReceiptProps {
 
 export default function SuccessReceipt({ data, onClose, onAddMore }: SuccessReceiptProps) {
   const printRef = useRef<HTMLDivElement>(null)
+  const receiptRef = useMemo(
+    () => `REC-${Math.random().toString(36).slice(2, 10).toUpperCase()}`,
+    []
+  )
 
   const totalAmount = data.reduce((sum, row) => 
     sum + (Number(row.price) || 0) * (Number(row.quantity) || 0), 0
@@ -31,19 +35,29 @@ export default function SuccessReceipt({ data, onClose, onAddMore }: SuccessRece
 
   const handlePrint = () => {
     const printContents = printRef.current?.innerHTML
-    const originalContents = document.body.innerHTML
-    
-    if (printContents) {
-      document.body.innerHTML = `
-        <div style="padding: 20px; font-family: system-ui, sans-serif;">
-          <h2 style="text-align: center; margin-bottom: 20px;">Stock Entry Receipt</h2>
+    if (!printContents) return
+
+    const printWindow = window.open("", "_blank", "width=900,height=700")
+    if (!printWindow) return
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Stock Entry Receipt</title>
+          <style>
+            body { font-family: system-ui, sans-serif; padding: 24px; color: #0f172a; }
+            h2 { text-align: center; margin-bottom: 20px; }
+          </style>
+        </head>
+        <body>
+          <h2>Stock Entry Receipt</h2>
           ${printContents}
-        </div>
-      `
-      window.print()
-      document.body.innerHTML = originalContents
-      window.location.reload() // Restore React app
-    }
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
   }
 
   const currentDate = new Date().toLocaleString("en-IN", {
@@ -76,7 +90,7 @@ export default function SuccessReceipt({ data, onClose, onAddMore }: SuccessRece
         <div ref={printRef} className="p-6 overflow-y-auto flex-1">
           <div className="mb-4 flex justify-between text-sm text-[var(--text-muted)] border-b border-[var(--border-card)] pb-2">
             <span>Date: {currentDate}</span>
-            <span>Ref: #{Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+            <span>Ref: #{receiptRef}</span>
           </div>
 
           <div className="space-y-3">

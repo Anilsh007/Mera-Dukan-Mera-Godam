@@ -3,7 +3,7 @@
 import { ProtectedRoute, Sidebar, Header } from "@/app/components/client/useClient"
 import { useState } from "react"
 import { Toaster } from "sonner"
-import DriveSyncManager from "@/app/lib/DriveSyncManager"
+import SupabaseSyncManager from "../lib/dataSyncManager"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <Toaster richColors position="top-right" />
-        <DriveSyncManager />
+        <SupabaseSyncManager />
       </div>
     </ProtectedRoute>
   )

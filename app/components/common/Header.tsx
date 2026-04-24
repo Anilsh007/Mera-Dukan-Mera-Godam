@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { signOut, onAuthStateChanged, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth, ThemeToggle } from "@/app/components/client/useClient";
+import Link from "next/link"
 import { LogOut, Menu, User as UserIcon } from "lucide-react";
 import logo from "@/assets/logo.svg";
 
@@ -46,7 +47,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* Profile */}
         <div className="relative" ref={ref}>
-          <button onClick={() => setOpen(o => !o)} className="cursor-pointer flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border border-[var(--border-color)] hover:bg-[var(--bg-primary)] transition-all" >
+          <button onClick={() => setOpen(o => !o)} className="cursor-pointer flex items-center gap-0 sm:gap-2 pl-0 sm:pl-1 pr-0 sm:pr-2 py-0 sm:py-1 rounded-full border border-[var(--border-color)] hover:bg-[var(--bg-primary)] transition-all" >
             {user?.photoURL ? (
               <img src={user.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-7 h-7 rounded-full" />
             ) : (
@@ -68,6 +69,9 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                   <p className="text-xs text-[var(--text-muted)] truncate">{user?.email}</p>
                 )}
               </div>
+              <Link href="/dashboard/profile" className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-primary)] transition-colors">
+                <UserIcon size={15} /> Profile
+              </Link>
               <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer">
                 <LogOut size={15} /> Logout
               </button>
